@@ -1,12 +1,25 @@
-#import "../../notes.typ":*
-#show :notes
-
+// #import "../../notes.typ":*
+// #show:notes
+#import "@local/ysz_tools:0.1.0":*
+#show: conf.with(
+   title:"s"
+)
+#import "@preview/cuti:0.4.0":show-cn-fakebold
+#show:show-cn-fakebold
+//#show ",":"，"
+//#show ":":"："
+#import "@preview/cetz:0.4.1"
+#import "@preview/mitex:0.2.5": *
+#show math.equation: it => {
+  show "xx": $bold(x)$
+  it
+}
 == 线性回归
 === 基本概念
 #definition[线性回归][
 线性回归（linear regression）是利用称为线性回归方程的最小二乘函数对一个或多个自变量和因变量之间关系进行建模的一种回归分析。这种函数是一个或多个称为回归系数的模型参数的线性组合。只有一个自变量的情况称为简单回归，大于一个自变量情况的叫做多元回归（multivariable linear regression）。
 
-给定数据集$D={(x_1,y_1),(x_2,y_2),dots,(x_m,y_m)}$, 样本空间由$d$维向量张成, $x_i=(x_"i1",x_"i2",dots,x_"id")^T, y_i in R$, 则：
+给定数据集$D={("xx"_1,y_1),(x_2,y_2),dots,(x_m,y_m)}$, 样本空间由$d$维向量张成, $x_i=(x_"i1",x_"i2",dots,x_"id")^T, y_i in RR$, 则：
 
 线性回归方程为：
 $
@@ -32,6 +45,8 @@ $
 $
   hat(y_i)=g(x_i)=x_i^T (X^T X)^(-1)X^T y
 $
+
+这便是最小二乘法.
 若$X^T X$为满秩矩阵，则$(X^T X)^(-1)$可求，最优参数$w^*$可直接解出，但是往往会遇到样本维数远大于样本个数（此时行数小于列数，一定不满秩）的情况，比如图像样本，则会导致$X^T X$不满秩。若不可逆，则采用梯度下降法（后续展开）来训练参数。
 
 #remark[
@@ -40,62 +55,55 @@ $
   同时$X$矩阵也增加了一个全是1的列。
 ]
 
-#note[矩阵求导方法][
 
-*方法一：展开求导法 (Standard Expansion)*
 
-这是最稳健的方法，核心是将矩阵运算展开成多项式形式，类比标量求导。
 
-1. *展开矩阵乘法*：
-   利用转置性质 $(A - B)^T = A^T - B^T$，将式子展开：
-   $ L(w) &= (y^T - w^T X^T) (y - X w) \
-          &= y^T y - underbrace(y^T X w, "标量 A") - underbrace(w^T X^T y, "标量 B") + w^T X^T X w $
+// #note[矩阵求导方法][
+// 方法一：展开求导法 (Standard Expansion)
 
-2. *合并同类项*：
-   注意 $y^T X w$ 的结果是一个实数（标量）。实数的转置等于它自身：
-   $ (y^T X w)^T = w^T X^T y $
-   因此中间两项相等，可以合并：
-   $ L(w) = y^T y - 2 w^T X^T y + w^T X^T X w $
+// 这是最稳健的方法，核心是将矩阵运算展开成多项式形式，类比标量求导。
+// 展开矩阵乘法：
+// 利用转置性质 $(bold(A) - bold(B))^T = bold(A)^T - bold(B)^T$，将式子展开：
+// $ L(bold(w)) &= (bold(y)^T - bold(w)^T bold(X)^T) (bold(y) - bold(X) bold(w))
+// &= bold(y)^T bold(y) - underbrace(bold(y)^T bold(X) bold(w), "标量 A") - underbrace(bold(w)^T bold(X)^T bold(y), "标量 B") + bold(w)^T bold(X)^T bold(X) bold(w) $
+// 合并同类项：
+// 注意 $bold(y)^T bold(X) bold(w)$ 的结果是一个实数（标量）。实数的转置等于它自身：
+// $(bold(y)^T bold(X) bold(w))^T = bold(w)^T bold(X)^T bold(y)$
+// 因此中间两项相等，可以合并：
+// $L(bold(w)) = bold(y)^T bold(y) - 2 bold(w)^T bold(X)^T bold(y) + bold(w)^T bold(X)^T bold(X) bold(w)$
+// 逐项求导：
+// 利用矩阵求导公式：
+// $nabla_{bold(w)} (bold(w)^T bold(a)) = bold(a)$ （类比 $a x$' 的导数为 $a$）
+// $nabla_{bold(w)} (bold(w)^T bold(A) bold(w)) = 2 bold(A) bold(w)$ （类比 $a x^2$' 的导数为 $2a x$）
+// 得：
+// $(partial L(bold(w))) / (partial bold(w)) = 0 - 2 bold(X)^T bold(y) + 2 bold(X)^T bold(X) bold(w)$
+// 方法二：链式法则法 (Chain Rule)
+// 这是更快捷的方法，将 $(bold(y) - bold(X) bold(w))$ 看作一个整体，避免繁琐的展开。
+// 令中间变量 $bold(z) = bold(y) - bold(X) bold(w)$，则 $L(bold(w)) = bold(z)^T bold(z)$。
+// 根据复合函数求导法则（外层导数 $times$ 内层导数）：
+// $(partial L) / (partial bold(w)) = (partial bold(z)) / (partial bold(w))^T dot (partial L) / (partial bold(z))$
+// 外层导数 ($L$ 对 $bold(z)$)：
+// $L = bold(z)^T bold(z) = ||bold(z)||^2$，类比 $x^2$，导数为 $2bold(z)$。
+// $(partial L) / (partial bold(z)) = 2 bold(z) = 2(bold(y) - bold(X) bold(w))$
+// 内层导数 ($bold(z)$ 对 $bold(w)$)：
+// $bold(z) = bold(y) - bold(X) bold(w)$，类比 $-a x$，导数系数为 $-bold(X)$。
+// $(partial bold(z)) / (partial bold(w)) = -bold(X)$
+// 组合：
+// 注意维度匹配（内层系数转置后左乘外层）：
+// $ (partial L(bold(w))) / (partial bold(w)) &= (-bold(X))^T dot 2(bold(y) - bold(X) bold(w))
+// &= -2 bold(X)^T (bold(y) - bold(X) bold(w))
+// &= -2 bold(X)^T bold(y) + 2 bold(X)^T bold(X) bold(w) $
+// ]
+// #note[
+// 特别地，对于二元线性回归，有：
+// $
+// w_1&=frac(sum_(i=1)^n (x_i-macron(x))(y_i-macron(y)), sum_(i=1)^n (x_i-macron(x))^2)
+// w_0&=macron(y)-w_1 macron(x)
+// $
+// ]
+微分法 (Differential Method)：这是处理复杂表达式最高效的方法。首先计算标量函数的微分 $d f$，然后将其整理成与 $d X$ 内积的形式，即 $ d f = tr((∂f/∂X)ᵀ d X)$，从而直接读出导数。
+$$
 
-3. *逐项求导*：
-   利用矩阵求导公式：
-   - $nabla_w (w^T a) = a$ （类比 $a x$' 的导数为 $a$）
-   - $nabla_w (w^T A w) = 2 A w$ （类比 $a x^2$' 的导数为 $2a x$）
-   
-   得：
-   $ (partial L(w)) / (partial w) = 0 - 2 X^T y + 2 X^T X w $
-
-*方法二：链式法则法 (Chain Rule)*
-
-这是更快捷的方法，将 $(y - X w)$ 看作一个整体，避免繁琐的展开。
-
-令中间变量 $z = y - X w$，则 $L(w) = z^T z$。
-根据复合函数求导法则（外层导数 $times$ 内层导数）：
-
-$ (partial L) / (partial w) = (partial z) / (partial w)^T dot (partial L) / (partial z) $
-
-1. *外层导数* ($L$ 对 $z$)：
-   $L = z^T z = ||z||^2$，类比 $x^2$，导数为 $2z$。
-   $ (partial L) / (partial z) = 2 z = 2(y - X w) $
-
-2. *内层导数* ($z$ 对 $w$)：
-   $z = y - X w$，类比 $-a x$，导数系数为 $-X$。
-   $ (partial z) / (partial w) = -X $
-
-3. *组合*：
-   注意维度匹配（内层系数转置后左乘外层）：
-   $ (partial L(w)) / (partial w) &= (-X)^T dot 2(y - X w) \
-   &= -2 X^T (y - X w) \
-   &= -2 X^T y + 2 X^T X w $
-
-]
-#note[
-  特别地，对于二元线性回归，有：
-  $
-    w_1&=frac(sum_(i=1)^n (x_i-macron(x))(y_i-macron(y)), sum_(i=1)^n (x_i-macron(x))^2)\
-    w_0&=macron(y)-w_1 macron(x)
-  $
-]
 === 岭回归与拉索回归
 
 岭回归（Ridge regression）和拉索回归（ Lasso regression ）是带有正则化的线性回归。
@@ -121,7 +129,7 @@ $I$是单位矩阵，保证$(X^T X+lambda I)$可逆，$w$具有闭式解。
   ),
   // ===== 表格主体 =====
   [*计算效率*],
-  [特征维度高时，计算逆矩阵的*代价非常高*（复杂度约O(n³)）],
+  [特征维度高时，计算逆矩阵的*代价非常高*（复杂度约$O(n³)$）],
   [通过迭代逼近，*避免直接求逆*，适合高维特征],
 
   [*内存需求*],
@@ -156,8 +164,8 @@ $
 $
 
 #note[正则化项设计对比][
-  - *​L2正则化（岭回归）*​​：惩罚项是权重的平方和。这是一个平滑的、凸的函数，其梯度在权重接近零时也会变小。因此，在优化过程中，权重会逐渐缩小，但除非正则化参数λ趋于无穷大，否则权重不会精确为零。这意味着所有特征都会被保留，只是权重值变小了。
-  - *​L1正则化（Lasso回归）*​​：惩罚项是权重的绝对值之和。这是一个非平滑的函数，在零点处不可导（有“尖点”）。当使用梯度下降或专用算法（如坐标下降）优化时，这些尖点使得最优解更容易出现在坐标轴上，即某些权重恰好为零。这称为*稀疏性*。
+  - *L2正则化（岭回归）*​​：惩罚项是权重的平方和。这是一个平滑的、凸的函数，其梯度在权重接近零时也会变小。因此，在优化过程中，权重会逐渐缩小，但除非正则化参数λ趋于无穷大，否则权重不会精确为零。这意味着所有特征都会被保留，只是权重值变小了。
+  - *L1正则化（Lasso 回归）*​​：惩罚项是权重的绝对值之和。这是一个非平滑的函数，在零点处不可导（有“尖点”）。当使用梯度下降或专用算法（如坐标下降）优化时，这些尖点使得最优解更容易出现在坐标轴上，即某些权重恰好为零。这称为*稀疏性*。
 
 #figure(
   table(
@@ -318,6 +326,21 @@ $
   包含偏置参数，一次项，高次项，交叉项等。这里要额外注意过拟合现象。*将多项式回归中的高次项和交叉项视为新的特征变量，从而将非线性问题转化为线性问题。*
 ]
 
+
+通过一组基函数 $Phi(bold(x))$，可以将低维数据映射到高维特征空间，从而实现非线性回归：
+
+$
+  g(bold(x)) = sum_(j=0)^M w_j phi_j (bold(x)) = bold(w)^T Phi(bold(x))
+$
+
+其中：
+- $bold(w) = [w_0, w_1, dots, w_M]^T$ 是待求的 *权重向量*。
+- $Phi(bold(x)) = [phi_0(bold(x)), phi_1(bold(x)), dots, phi_M (bold(x))]^T$ 是选定的一组 *基函数向量*。
+- 通常令 $phi_0(bold(x)) = 1$ 作为偏置项。
+#remark[说人话：利用已有的样本特征生成新的样本,或者叫latent space?]
+
+
+// 需要一个线性可分的实例,等他发ppt吧
 #example[
 
 为了深入理解岭回归的计算过程及其对模型参数的影响，我们构建一个极简的一元线性回归数据集进行手算推导。
