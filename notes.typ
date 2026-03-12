@@ -4,6 +4,7 @@
 #import "@preview/hydra:0.6.2": hydra
 #import "@preview/i-figured:0.2.4"
 #import "@preview/cetz:0.3.1"
+#import "@preview/mitex:0.2.6":*
 
 // --- 定义模板函数 ---
 #let notes(
