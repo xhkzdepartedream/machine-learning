@@ -10,7 +10,7 @@
 #let notes(
   font: ("Source Han Serif SC"),
   margin:(top: 2.5cm, left: 1.5cm, right: 1.5cm, bottom: 1.5cm),
-  font-size: 12pt,
+  font-size: 11pt,
   paper: "a4",
   heading-numbering: numbly(
     "第{1}章",
