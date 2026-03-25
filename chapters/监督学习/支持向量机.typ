@@ -31,7 +31,22 @@
   )
 })
 #let remark = note
+#let appendix(body) = {
+  // 1. 重置标题计数器
+  counter(heading).update(0)
+  
+  // 2. 针对附录内部的所有标题设置新格式
+  set heading(numbering: "A.1")
+  
+  // 3. (可选) 如果你希望一级标题显示为 "附录 A. xxx"
+  show heading.where(level: 1): it => {
+    let nos = counter(heading).at(it.location())
+    let letter = numbering("A", ..nos)
+    block(sticky: true,[Appendix #letter #it.body])
+  }
 
+  body
+}
 == 支持向量机
 支持向量机(support vector machine, SVM)是一种二类分类模型,它的基本模型是定义在特征空间上的*间隔最大*的线性分类器,间隔最大使他有别于感知机；支持向量机还包括核技巧,这使它成为实质上的非线性分类器.
 
@@ -831,41 +846,8 @@ $
 通常所说的核函数就是*正定核函数*.一个函数$K$是正定核函数,当且仅当Gram矩阵$
  KK eq.delta [K(x_i,x_j)]_(m times m)
 $
-是半正定的.
-#theorem[
-  设$K:cal(X)times cal(X)arrow.r R$是对称函数,则$K(x,z)$为正定核函数的充要条件是对任意$x_i in cal(X),i=1,2,dots,m$,$K(x,z)$对应的Gram矩阵是半正定矩阵.
-]
-#proof[
-  
-  *必要性.*由于$K(x,z)$是$cal(X)times cal(X)$上的正定核,所以存在从$cal(X)$到希尔伯特空间$cal(H)$的映射$phi.alt$,使得
-  $
-    K(x,z)=phi.alt(x)dot phi.alt(z)
-  $
-  于是,对任意$x_1,x_2,dots,x_m$,构造$K(x,z)$关于$x_1,x_2,dots,x_m$的Gram矩阵：
-  $
-    [K_(i j)]_(m times m)=[K(x_i,x_j)]_(m times m)
-  $
-  对任意$c_1,c_2,dots,c_m in R$,有：
-  $
-    sum_(i,j=1)^m c_i c_j K(x_i,x_j)
-    &=sum_(i,j=1)^m c_i c_j (phi.alt(x_i)dot phi.alt(x_j))\
-    &=(sum_i c_i phi.alt(x_i))dot (sum_j c_j phi.alt(x_j))\
-    &=norm(sum_i c_i phi.alt(x_i))^2 gt.eq.slant 0
-  $
-  表面$K(x,z)$关于$x_1,x_2,dots,x_m$的Gram矩阵是半正定的.
-
-  *充分性.*
-  对任意$x_1,x_2,dots,x_m in cal(X)$,已知对称函数$K(x,z)$关于$x_1,x_2,dots,x_m$的Gram矩阵是半正定的,对于给定的$K(x,z)$,可以构造从$cal(X)$到某个希尔伯特空间$cal(H)$的映射：
-  $
-    phi.alt:x arrow.r K(dot,x)
-  $
-  易知：
-  $
-    K(dot,x)dot f =f(x)\
-    K(dot,x)dot K(dot,z)=K(x,z)\
-  $
-  表明$K(x,z)$是$cal(X)times cal(X)$上的核函数.
-]#note[
+是半正定的.证明见附录.
+#note[
   这其实就是对于正定核的等价定义.对于一个具体函数验证它是否为正定核函数并不容易,因为要求对任意有限输入集${x_1,x_2,dots,x_m}$验证$K$对应的Gram矩阵是半正定矩阵.在实际问题中往往应用已有的核函数.
 ]
 #table(
@@ -1201,3 +1183,40 @@ $
   $ w = 0.25 x_1 - 0.25 x_3 = (0.5, 0.5)^T $
   $ b = -2 $
   这正好就是我们之前用全局代数法求出的精确解！说明对于这个简单数据集,SMO 一步就收敛了.
+  #appendix[
+    = Proof of Theorems
+    #theorem[
+  设$K:cal(X)times cal(X)arrow.r R$是对称函数,则$K(x,z)$为正定核函数的充要条件是对任意$x_i in cal(X),i=1,2,dots,m$,$K(x,z)$对应的Gram矩阵是半正定矩阵.
+]
+#proof[
+  
+  *必要性.*由于$K(x,z)$是$cal(X)times cal(X)$上的正定核,所以存在从$cal(X)$到希尔伯特空间$cal(H)$的映射$phi.alt$,使得
+  $
+    K(x,z)=phi.alt(x)dot phi.alt(z)
+  $
+  于是,对任意$x_1,x_2,dots,x_m$,构造$K(x,z)$关于$x_1,x_2,dots,x_m$的Gram矩阵：
+  $
+    [K_(i j)]_(m times m)=[K(x_i,x_j)]_(m times m)
+  $
+  对任意$c_1,c_2,dots,c_m in R$,有：
+  $
+    sum_(i,j=1)^m c_i c_j K(x_i,x_j)
+    &=sum_(i,j=1)^m c_i c_j (phi.alt(x_i)dot phi.alt(x_j))\
+    &=(sum_i c_i phi.alt(x_i))dot (sum_j c_j phi.alt(x_j))\
+    &=norm(sum_i c_i phi.alt(x_i))^2 gt.eq.slant 0
+  $
+  表面$K(x,z)$关于$x_1,x_2,dots,x_m$的Gram矩阵是半正定的.
+
+  *充分性.*
+  对任意$x_1,x_2,dots,x_m in cal(X)$,已知对称函数$K(x,z)$关于$x_1,x_2,dots,x_m$的Gram矩阵是半正定的,对于给定的$K(x,z)$,可以构造从$cal(X)$到某个希尔伯特空间$cal(H)$的映射：
+  $
+    phi.alt:x arrow.r K(dot,x)
+  $
+  易知：
+  $
+    K(dot,x)dot f =f(x)\
+    K(dot,x)dot K(dot,z)=K(x,z)\
+  $
+  表明$K(x,z)$是$cal(X)times cal(X)$上的核函数.
+]
+  ]
