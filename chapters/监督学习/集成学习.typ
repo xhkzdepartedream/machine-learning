@@ -96,16 +96,22 @@
   某些任务的真实最佳分类器不在当前算法能表达的范围内。单个模型无效，但多个模型线性组合后可能逼近真实分类器。
 
 === How to Ensenble?
-A. Combination level（集成层面）
+- Combination level（集成层面）
 设计不同的“组合器”（Combiner），比如投票、加权平均、Stacking元学习器等。
 ✅ 举例：同样是5个模型，你可以用“多数投票”，也可以用“按准确率加权”，还可以用另一个模型来学习怎么组合它们 —— 这就是在“集成层面”制造多样性。
-B. Classifier level（模型层面）
+
+- Classifier level（模型层面）
 使用不同的基分类器（Base Classifiers），比如有的用决策树，有的用SVM，有的用神经网络。
 ✅ 举例：异质集成（如Stacking）就是在这个层面做文章 —— 让不同算法的模型一起工作。
-C. Feature level（特征层面）
+
+- Feature level（特征层面）
 给每个模型提供不同的特征子集（Feature Subsets）。
 ✅ 举例：随机森林中每棵树只看到部分特征；或者人工给不同模型分配不同列的数据。
-D. Data level（数据层面）
+
+- Data level（数据层面）
 给每个模型提供不同的数据子集（Data Subsets），比如自助采样（Bootstrap Sampling）。
 ✅ 举例：Bagging / 随机森林的核心 —— 每棵树训练在不同的 bootstrap 样本上。
-(先放在这)
+
+#include ("Boosting.typ")
+
+#include ("Bagging与随机森林.typ")

@@ -1,8 +1,59 @@
-#import "../../notes.typ":*
-#show :notes
+#import "@local/ysz_tools:0.1.0": *
+#show: conf
+#import "@preview/cuti:0.4.0":show-cn-fakebold
+//#show:show-cn-fakebold
+#import "@preview/marginalia:0.3.1" as marginalia: note, notefigure, wideblock
+#import "@preview/mitex:0.2.6": *
+#show: marginalia.setup.with(
+  inner: (far: 1mm, width: 1mm, sep: 1mm), //we dont use inner btw
+  outer: (far: 5mm, width: 55mm, sep: 8mm),
+  top: 2.5cm,
+  bottom: 2.5cm,
+  book: true,
+  clearance: 20pt,
+)
+#show: marginalia.show-frame
+#let a-note-counter = counter("a-note")
+#let note = note.with(counter: a-note-counter, numbering: (..i) => text(
+  weight: 500,
+  font: "JetBrains Mono",
+  size: 7pt,
+  style: "normal",
+  fill: rgb("#ff3a3a"),
+  numbering("[a]", ..i),
+))
+#set page(header: context if here().page() > 0 {
+  marginalia.header(
+    text-style: (size: 11.5pt, number-type: "old-style"),
+    [],
+    [#smallcaps[Machine Learning] #text(fill: luma(60%))[_CHAPTER 4_]],
+    [Page #counter(page).display("1 of 1", both: true)],
+  )
+})
+#let remark = note
+#let appendix(body) = {
+  // 1. 重置标题计数器
+  counter(heading).update(0)
+  
+  // 2. 针对附录内部的所有标题设置新格式
+  set heading(numbering: "A.1")
+  
+  // 3. (可选) 如果你希望一级标题显示为 "附录 A. xxx"
+  show heading.where(level: 1): it => {
+    let nos = counter(heading).at(it.location())
+    let letter = numbering("A", ..nos)
+    block(sticky: true,[Appendix #letter #it.body])
+  }
+
+  body
+}
 == $k$近邻法
 
-$k$近邻法的*输入为实例的特征向量*，对应于特征空间的点；输出为*实例的类别*，可以取多类。$k$近邻法假设给定一个训练数据集，其中实例类别已定。分类时，对新的实例，根据其$k$个最近邻的训练实例的类别，通过*多数表决*的方式进行预测。$k$近邻法实际上利用训练数据集对特征向量空间进行划分，并作为其分类的模型。*$k$值的选择、距离度量*及*分类决策规则*是$k$近邻法的3个基本要素。
+$k$近邻法的*输入为实例的特征向量*，对应于特征空间的点；输出为*实例的类别*，可以取多类。
+
+$k$近邻法假设给定一个训练数据集，其中实例类别已定。分类时找出距离$x$最近的$k$个点，看这$k$个点里面哪个类的最多。
+
+利用训练数据集对特征向量空间进行划分，并作为其分类的模型。*$k$值的选择、距离度量*及*分类决策规则*是$k$近邻法的3个基本要素。
 
 === $k$近邻算法
 
@@ -13,19 +64,17 @@ $k$近邻法的*输入为实例的特征向量*，对应于特征空间的点；
 
 *输出*：实例$x$所属的类$y$.
 
+找出距离$x$最近的$k$个点，看这$k$个点里面哪个类的最多。
 
-
-1. 根据给定的距离度量，在训练集$T$中找出与$x$最邻近的$k$个点，涵盖这$k$个点的$x$的邻域记作$N_k (x)$   
-2. 在$N_k (x)$中根据分类决策规则（如多数表决）决定$x$的类别$y$      $      y=arg max_(c_j) sum_(x_i in N_k(x)) I(y_i=c_j),i=1,2,dots,N,j=1,2,dots,K
-     $ 
+// 1. 根据给定的距离度量，在训练集$T$中找出与$x$最邻近的$k$个点，涵盖这$k$个点的$x$的邻域记作$N_k (x)$   
+// 2. 在$N_k (x)$中根据分类决策规则（如多数表决）决定$x$的类别$y$      $      y=arg max_(c_j) sum_(x_i in N_k(x)) I(y_i=c_j),i=1,2,dots,N,j=1,2,dots,K
+//      $ 
 ]
 
 #remark[
-$k=1$的时候，$k$近邻法变成*最近邻算法*。对于输入的实例点（特征向量）$x$，最近邻法将训练数据集中与$x$最邻近点的类作为$x$的类。
-]
+$k=1$的时候，$k$近邻法变成*最近邻算法*，将训练数据集中与$x$最邻近点的类作为$x$的类。
 
-#note[
-  $k$近邻法没有显式的学习过程。k近邻法的“学习”就是纯粹的记忆，它不会从数据中提炼出任何超越数据本身的规则或模型。正因为如此，它也被归类为 ​​“懒惰学习”​​ 或 ​​“基于实例的学习”​​
+$k$近邻法没有显式的学习过程。k近邻法的“学习”就是纯粹的记忆，它不会从数据中提炼出任何超越数据本身的规则或模型。正因为如此，它也被归类为 ​​“懒惰学习”​​ 或 ​​“基于实例的学习”​​
 ]
 
 
