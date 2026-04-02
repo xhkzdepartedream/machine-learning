@@ -1,53 +1,11 @@
 #import "@local/ysz_tools:0.1.0": *
-#show: conf
-#import "@preview/cuti:0.4.0":show-cn-fakebold
-#show:show-cn-fakebold
-#import "@preview/marginalia:0.3.1" as marginalia: note, notefigure, wideblock
-#import "@preview/mitex:0.2.6": *
-#show: marginalia.setup.with(
-  inner: (far: 1mm, width: 1mm, sep: 1mm), //we dont use inner btw
-  outer: (far: 5mm, width: 55mm, sep: 8mm),
-  top: 2.5cm,
-  bottom: 2.5cm,
-  book: true,
-  clearance: 20pt,
-)
-#show: marginalia.show-frame
-#let a-note-counter = counter("a-note")
-#let note = note.with(counter: a-note-counter, numbering: (..i) => text(
-  weight: 500,
-  font: "JetBrains Mono",
-  size: 7pt,
-  style: "normal",
-  fill: rgb("#ff3a3a"),
-  numbering("[a]", ..i),
-))
-#set page(header: context if here().page() > 0 {
-  marginalia.header(
-    text-style: (size: 11.5pt, number-type: "old-style"),
-    [],
-    [#smallcaps[Machine Learning] #text(fill: luma(60%))[_CHAPTER 4_]],
-    [Page #counter(page).display("1 of 1", both: true)],
-  )
-})
-#let remark = note
-#let appendix(body) = {
-  // 1. 重置标题计数器
-  counter(heading).update(0)
-  
-  // 2. 针对附录内部的所有标题设置新格式
-  set heading(numbering: "A.1")
-  
-  // 3. (可选) 如果你希望一级标题显示为 "附录 A. xxx"
-  show heading.where(level: 1): it => {
-    let nos = counter(heading).at(it.location())
-    let letter = numbering("A", ..nos)
-    block(sticky: true,[Appendix #letter #it.body])
-  }
 
-  body
-}
+#show: conf.with(
+  title: "shabi",
+)
+
 == 低维嵌入
+
 核心直觉：空间扩张速度远超数据填充速度。在高维情形下出现的数据样本稀疏、距离计算困难等问题，是机器学习方法共同面临的严重障碍，被称为维数灾难（维数爆炸）。
 
 为了缓解维数灾难,需要把原始高维度属性转换为一个低维度子空间,也就是学一个embedding。
@@ -305,13 +263,14 @@ $ bold(Y)_("new") = bold(B) dot bold(alpha)_1 = mat(
   如果保留所有的主成分，PCA 就仅仅是一个正交变换（Orthogonal Transformation），或者更通俗地说，就是一次坐标轴旋转。
 ]
 
+
+#unim[
 *1. 为什么数据中心化操作不会失真？*
 
 #remark[
   中心化（$x_i - mu$）在几何上等同于坐标系的“平移”，而不是“缩放”或“扭曲”。
   数据的内部结构（点与点之间的相对距离）和形状（数据的分布形态）在平移后完全保持不变。做这一步是为了让后续计算（特别是协方差公式）变得极其简洁。
 ]
-
 #proof[
   根据方差的定义：$op("Var")(x) = E[(x - mu)^2]$。
   如果我们构造新变量 $x' = x - mu$（即中心化），那么新变量的均值为 0。
@@ -319,8 +278,6 @@ $ bold(Y)_("new") = bold(B) dot bold(alpha)_1 = mat(
   
   可见 $op("Var")(x') = op("Var")(x)$，数据的波动性（信息量）完全没有丢失。
 ]
-
-
 
 *2. 为什么“确定投影方向”等价于“确定系数向量”？*
 
@@ -418,6 +375,13 @@ $ bold(Y)_("new") = bold(B) dot bold(alpha)_1 = mat(
 
   其中，$lambda_k$ 是 $bold(Sigma)$ 的第 $k$ 个特征值，$bold(alpha)_k$ 是对应的单位特征向量，$k = 1, 2, dots, m$。
 ]
+
+]
+
+
+
+
+
 
   *1. 特征值分解与协方差矩阵对角化*
   
@@ -844,7 +808,34 @@ $ Y &= (1 / sqrt(5) mat(1, 2)) mat(
 
 #mi(`\mathbf{W}`) 就是高维空间里的主成分方向。
 
-令#mi(`\alpha_i = \frac{1}{\lambda} \boldsymbol{z}_i^\top \mathbf{W}`)，#mitex(`\mathbf{W} = \frac{1}{\lambda} \left( \sum_{i=1}^m \mathbf{z}_i \mathbf{z}_i^\mathrm{T} \right) \mathbf{W} = \sum_{i=1}^m \mathbf{z}_i \frac{\mathbf{z}_i^\mathrm{T} \mathbf{W}}{\lambda} = \sum_{i=1}^m \mathbf{z}_i \boldsymbol{\alpha}_i`)
+令#mi(`\alpha_i = \frac{1}{\lambda} \boldsymbol{z}_i^\top \mathbf{W}`)，#mitex(`\mathbf{W} = \frac{1}{\lambda} \left( \sum_{i=1}^m \mathbf{z}_i \mathbf{z}_i^\mathrm{T} \right) \mathbf{W} = \sum_{i=1}^m \mathbf{z}_i \frac{\mathbf{z}_i^\mathrm{T} \mathbf{W}}{\lambda} = \sum_{i=1}^m \mathbf{z}_i \boldsymbol{\alpha}_i=\mathbf{Z}\mathbf{\alpha}`)
+
+将#mi(`\mathbf{W}`)的表示代入：
+#mitex(`\left( \mathbf{Z}\mathbf{Z}^\top\right) (\mathbf{Z}\boldsymbol{\alpha}) = \lambda (\mathbf{Z}\boldsymbol{\alpha})`)
+
+等式两边同时左乘一个 #mi(`\mathbf{Z}^\top`)：#mitex(` \mathbf{Z}^\top\mathbf{Z} (\mathbf{Z}^\top\mathbf{Z}) \boldsymbol{\alpha} = \lambda \mathbf{Z}^\top\mathbf{Z} \boldsymbol{\alpha}`)
+
+#mi(`\mathbf{Z}^\top\mathbf{Z}`) 是一个 #mi(`m \times m`) 的方阵，里面的每一个元素刚好就是 #mi(`\boldsymbol{z}_i^\top \boldsymbol{z}_j`)。故可以用核函数直接计算的核矩阵 #mi(`\mathbf{K}`)。
+
+把 #mi(`\mathbf{K} = \mathbf{Z}^\top\mathbf{Z}`) 代进去：
+
+#mitex(`\mathbf{K} \mathbf{K} \boldsymbol{\alpha} = \lambda \mathbf{K} \boldsymbol{\alpha}`)
+
+等式两边消去一个 #mi(`\mathbf{K}`)（简化说明，严格证明涉及特征空间分解）：
+
+#mitex(`\mathbf{K} \boldsymbol{\alpha} = \lambda \boldsymbol{\alpha}`)
+
+#mi(`\mathbf{K}`)是一个 #mi(`m \times m`) 的常数矩阵，靠低维样本代入核函数 #mi(`\kappa(\boldsymbol{x}_i, \boldsymbol{x}_j)`) 瞬间算完。#mi(`\lambda`) 是标量，相当于一个新的特征值。#mi(`\boldsymbol{\alpha}`) 就是已知矩阵 #mi(`\mathbf{K}`) 的特征向量。
+
+模型训练好了（求出了 #mi(`\boldsymbol{\alpha}`)），现在来了一个新样本 #mi(`\boldsymbol{x}`)，我们怎么把它降维呢？按理说，应该是新样本的高维坐标 #mi(`\phi(\boldsymbol{x})`) 乘以高维主成分 #mi(`\mathbf{w}_j`)：
+
+#mitex(`z_j = \mathbf{w}_j^\top \phi(\boldsymbol{x})`)
+
+把第 2 步中 #mi(`\mathbf{w}_j = \sum \alpha_i^j \phi(\boldsymbol{x}_i)`) 代入进去，再次出现了内积，并立刻用核函数替换：
+
+#mitex(`z_j = \sum_{i=1}^m \alpha_i^j \kappa(\boldsymbol{x}_i, \boldsymbol{x})`)
+
+#remark[为了求出一个新样本降维后的坐标，你需要用核函数去*计算新样本 #mi(`\boldsymbol{x}`) 和所有的训练样本 #mi(`\boldsymbol{x}_i`) 的关系并求和*。这与线性 PCA 完全不同（线性 PCA 只需要把新样本乘上一个投影矩阵就结束了）。所以，KPCA 虽然能处理复杂的非线性结构，但代价是*极高的预测（推理）计算开销*。]
 
 == 流形学习
 流形是在局部与欧氏空间同胚的空间.抛开*微分几何*而直观地说,在一个小邻域里,我们能用欧式距离来刻画.想在局部建立降维映射关系,然后再设法将局部映射关系推广到全局.#note[
