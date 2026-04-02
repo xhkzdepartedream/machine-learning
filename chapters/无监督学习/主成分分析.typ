@@ -1,68 +1,188 @@
-#import "../../notes.typ":*
-#show:notes
+#import "@local/ysz_tools:0.1.0": *
+#show: conf
+#import "@preview/cuti:0.4.0":show-cn-fakebold
+#show:show-cn-fakebold
+#import "@preview/marginalia:0.3.1" as marginalia: note, notefigure, wideblock
+#import "@preview/mitex:0.2.6": *
+#show: marginalia.setup.with(
+  inner: (far: 1mm, width: 1mm, sep: 1mm), //we dont use inner btw
+  outer: (far: 5mm, width: 55mm, sep: 8mm),
+  top: 2.5cm,
+  bottom: 2.5cm,
+  book: true,
+  clearance: 20pt,
+)
+#show: marginalia.show-frame
+#let a-note-counter = counter("a-note")
+#let note = note.with(counter: a-note-counter, numbering: (..i) => text(
+  weight: 500,
+  font: "JetBrains Mono",
+  size: 7pt,
+  style: "normal",
+  fill: rgb("#ff3a3a"),
+  numbering("[a]", ..i),
+))
+#set page(header: context if here().page() > 0 {
+  marginalia.header(
+    text-style: (size: 11.5pt, number-type: "old-style"),
+    [],
+    [#smallcaps[Machine Learning] #text(fill: luma(60%))[_CHAPTER 4_]],
+    [Page #counter(page).display("1 of 1", both: true)],
+  )
+})
+#let remark = note
+#let appendix(body) = {
+  // 1. 重置标题计数器
+  counter(heading).update(0)
+  
+  // 2. 针对附录内部的所有标题设置新格式
+  set heading(numbering: "A.1")
+  
+  // 3. (可选) 如果你希望一级标题显示为 "附录 A. xxx"
+  show heading.where(level: 1): it => {
+    let nos = counter(heading).at(it.location())
+    let letter = numbering("A", ..nos)
+    block(sticky: true,[Appendix #letter #it.body])
+  }
 
+  body
+}
+== 低维嵌入
+核心直觉：空间扩张速度远超数据填充速度。在高维情形下出现的数据样本稀疏、距离计算困难等问题，是机器学习方法共同面临的严重障碍，被称为维数灾难（维数爆炸）。
+
+为了缓解维数灾难,需要把原始高维度属性转换为一个低维度子空间,也就是学一个embedding。
+
+#definition("多维缩放（Multiple Dimensional Scaling, MDS）")[
+  要求数据在降维后（低维地图上）的欧氏距离，尽量等于降维前（原始高维空间中）的距离。
+]
+
+我们设$m$个样本在$d$维度里,距离矩阵是$bold(D) in RR^(m times m)$，目标是获得一个在$d' < d$维度的表示$bold(Z) in RR^(d' times m)$，使得在这个低维度里的距离和原来的距离一样.也就是$
+d_(i j)^2 &= ||z_i||^2 + ||z_j||^2 - 2z_i^T z_j\
+&= b_(i i) + b_(j j) - 2b_(i j)
+$
+其中$bold(B) = bold(Z)^T bold(Z) in RR^(m times m)$.
+将低维空间的坐标中心点（原点）放在所有样本的几何中心上：#mi(`\sum_{i=1}^m \boldsymbol{z}_i = 0`)。则内积矩阵 $bold(B)$ 的每一行之和、每一列之和都变成了 0。
+
+现在尝试求解$bold(B)$的每一个元素。注意到$
+b_(i j)  = -1/2 (d_(i j)^2 - d_(i .)^2 - d_(j .)^2 + d_(. .)^2)
+$
+所以分析$bold(B)$的前$d'$特征值我们就能分析出$bold(Z)$.$bold(B)$半正定,于是$
+ bold(B) = bold(V) Lambda bold(V)^T\
+ bold(Z) = Lambda^(1/2)_* bold(V)^T_*
+$
+
+当然实际操作中选前$d'$大的特征值即可.
 == 主成分分析
 
 主成分分析（principal componentanalysis，PCA）是一种常用的无监督学习方法，这一方法*利用正交变换把由线性相关变量表示的观测数据转换为少数几个由线性无关变量表示的数据*，线性无关的变量称为*主成分*。主成分的个数通常小于原始变量的个数，所以*主成分分析属于降维方法*。主成分分析主要用于发现数据中的基本结构，即数据中变量之间的关系，是数据分析的有力工具，也用于其他机器学习方法的前处理。
 
 === 总体主成分分析
 
-主成分分析中，首先对给定数据进行规范化，使得数据每一变量的平均值为0，方差为1。之后对数据进行正交变换，原来由线性相关变量表示的数据通过正交变换变成由若干个线性无关的新变量表示的数据。新变量是可能的正交变换中变量的方差的和（信息保存）最大的，方差表示在新变量上信息的大小。将新变量依次称为第一主成分、第二主成分等。这就是主成分分析的基本思想。通过主成分分析，可以利用主成分近似地表示原始数据，这可理解为发现数据的“基本结构”：也可以把数据由少数主成分表示，这可理解为对数据降维。
+// 主成分分析中，首先对给定数据进行规范化，使得数据每一变量的平均值为0，方差为1。之后对数据进行正交变换，原来由线性相关变量表示的数据通过正交变换变成由若干个线性无关的新变量表示的数据。新变量是可能的正交变换中变量的方差的和（信息保存）最大的，方差表示在新变量上信息的大小。将新变量依次称为第一主成分、第二主成分等。这就是主成分分析的基本思想。通过主成分分析，可以利用主成分近似地表示原始数据，这可理解为发现数据的“基本结构”：也可以把数据由少数主成分表示，这可理解为对数据降维。
 
-下面给出主成分分析的直观解释。数据集合中的样本由实数空间（正交坐标系）中的点表示，空间的一个坐标轴表示一个变量，规范化处理后得到的数据分布在原点附近。*对原坐标系中的数据进行主成分分析等价于进行坐标系旋转变换*，将数据投影到新坐标系的坐标轴上：新坐标系的第一坐标轴、第二坐标轴等分别表示第一主成分、第二主成分等，数据在每一轴上的坐标值的平方表示相应变量的方差：并且，这个坐标系是在所有可能的新的坐标系中，坐标轴上的方差的和最大的。
+// 下面给出主成分分析的直观解释。数据集合中的样本由实数空间（正交坐标系）中的点表示，空间的一个坐标轴表示一个变量，规范化处理后得到的数据分布在原点附近。*对原坐标系中的数据进行主成分分析等价于进行坐标系旋转变换*，将数据投影到新坐标系的坐标轴上：新坐标系的第一坐标轴、第二坐标轴等分别表示第一主成分、第二主成分等，数据在每一轴上的坐标值的平方表示相应变量的方差：并且，这个坐标系是在所有可能的新的坐标系中，坐标轴上的方差的和最大的。
 
-主成分分析选择方差最大的方向（第一主成分）作为新坐标系的第一坐标轴，即$y_1$轴，在这里意味着选择椭圆的长轴作为新坐标系的第一坐标轴; 之后选择与第一坐标轴正交且方差次之的方向（第二主成分）作为新坐标系的第二坐标轴，即$y_2$轴，在这里意味着选择椭圆的短轴作为新坐标系的第二坐标轴。在新坐标系里，数据中的变量$y_1$和$y_2$是线性无关的如果主成分分析只取第一主成分，即新坐标系的$y_1$轴，那么等价于将数据投影在椭圆长轴上，用这个主轴表示数据，将二维空间的数据压缩到一维空间中。
+// 主成分分析选择方差最大的方向（第一主成分）作为新坐标系的第一坐标轴，即$y_1$轴，在这里意味着选择椭圆的长轴作为新坐标系的第一坐标轴; 之后选择与第一坐标轴正交且方差次之的方向（第二主成分）作为新坐标系的第二坐标轴，即$y_2$轴，在这里意味着选择椭圆的短轴作为新坐标系的第二坐标轴。在新坐标系里，数据中的变量$y_1$和$y_2$是线性无关的如果主成分分析只取第一主成分，即新坐标系的$y_1$轴，那么等价于将数据投影在椭圆长轴上，用这个主轴表示数据，将二维空间的数据压缩到一维空间中。
 
-下面再看方差最大的解释。假设有两个变量 $x_1$ 和 $x_2$，三个样本点 A, B, C，样本分布在由 $x_1$ 轴和 $x_2$ 轴组成的坐标系中。对坐标系进行旋转变换，得到新的坐标轴 $y_1$，表示新的变量 $y_1$。样本点 A, B, C 在 $y_1$ 轴上投影，得到 $y_1$ 轴的坐标值 A', B', C'。
+// 下面再看方差最大的解释。假设有两个变量 $x_1$ 和 $x_2$，三个样本点 A, B, C，样本分布在由 $x_1$ 轴和 $x_2$ 轴组成的坐标系中。对坐标系进行旋转变换，得到新的坐标轴 $y_1$，表示新的变量 $y_1$。样本点 A, B, C 在 $y_1$ 轴上投影，得到 $y_1$ 轴的坐标值 A', B', C'。
 
-坐标值的平方和 $O A'^2 + O B'^2 + O C'^2$ 表示样本在变量 $y_1$ 上的方差和。主成分分析旨在选取正交变换中方差最大的变量，作为第一主成分，也就是旋转变换中坐标值的平方和最大的轴。注意到旋转变换中样本点到原点的距离的平方和 $O A^2 + O B^2 + O C^2$ 保持不变，根据勾股定理，坐标值的平方和 $O A'^2 + O B'^2 + O C'^2$ 最大等价于样本点到 $y_1$ 轴的距离的平方和 $A A'^2 + B B'^2 + C C'^2$ 最小。所以，*等价地，主成分分析在旋转变换中选取离样本点的距离平方和最小的轴作为第一主成分*。*第二主成分等的选取在保证与已选坐标轴正交的条件下类似地进行*。
+// 坐标值的平方和 $O A'^2 + O B'^2 + O C'^2$ 表示样本在变量 $y_1$ 上的方差和。主成分分析旨在选取正交变换中方差最大的变量，作为第一主成分，也就是旋转变换中坐标值的平方和最大的轴。注意到旋转变换中样本点到原点的距离的平方和 $O A^2 + O B^2 + O C^2$ 保持不变，根据勾股定理，坐标值的平方和 $O A'^2 + O B'^2 + O C'^2$ 最大等价于样本点到 $y_1$ 轴的距离的平方和 $A A'^2 + B B'^2 + C C'^2$ 最小。所以，*等价地，主成分分析在旋转变换中选取离样本点的距离平方和最小的轴作为第一主成分*。*第二主成分等的选取在保证与已选坐标轴正交的条件下类似地进行*。
 
-在数据总体（population）上进行的主成分分析称为总体主成分分析，在有限样本上进行的主成分分析称为样本主成分分析，前者是后者的基础。以下分别予以介绍。
+// 在数据总体（population）上进行的主成分分析称为总体主成分分析，在有限样本上进行的主成分分析称为样本主成分分析，前者是后者的基础。以下分别予以介绍。
 
-假设 $bold(x) = (x_1, x_2, dots, x_m)^T$ 是 $m$ 维随机变量，其均值向量是 $bold(mu)$：
 
-$ bold(mu) = E(bold(x)) = (mu_1, mu_2, dots, mu_m)^T $
+PCA 的几何本质是通过对原坐标系进行*正交变换（旋转）*，寻找一组新的线性无关的坐标轴。这组新轴能够*最大化投影方差*（保留最多信息），或等价地*最小化投影误差*，从而揭示数据的“基本结构”并实现降维。
 
-协方差矩阵是 $bold(Sigma)$：
+1. 预处理：数据规范化
+在进行坐标变换前，需对实数空间中的原始数据进行均值归0，方差归1.
+2. 几何直觉：坐标系旋转与方差最大化
+高维数据的分布通常呈现超椭球体。对数据进行 PCA，等价于在原点附近*旋转坐标系*：
+- *第一主成分 ($y_1$)*：选取方差最大的方向作为新坐标系的第一轴（对应*椭圆的长轴*）。此方向上保留了最大的数据信息。
+- *第二主成分 ($y_2$)*：在与 $y_1$ 正交的约束下，选取方差次之的方向作为第二轴（对应*椭圆的短轴*）。
 
-$ bold(Sigma) = op("cov")(bold(x), bold(x)) = E[(bold(x) - bold(mu)) (bold(x) - bold(mu))^T] $
+经过正交变换后，新坐标系中的各主成分（$y_1, y_2, dots$）彼此*线性无关*。
 
-考虑由 $m$ 维随机变量 $bold(x)$ 到 $m$ 维随机变量 $bold(y) = (y_1, y_2, dots, y_m)^T$ 的线性变换：
+3. 数学底层逻辑：方差与误差的对偶性
+PCA 选取“方差最大”方向的逻辑，完美等价于寻找“离样本点最近”的坐标轴。
 
-$ y_i = bold(alpha)_i^T bold(x) = alpha_(1i) x_1 + alpha_(2i) x_2 + dots + alpha_(m i) x_m $
+假设空间中有样本点 $A$，原点为 $O$，$A$ 在新坐标轴 $y_1$ 上的投影点为 $A'$。根据勾股定理：
+$ O A^2 = O A'^2 + A A'^2 $
 
-其中，$bold(alpha)_i^T = (alpha_(1i), alpha_(2i), dots, alpha_(m i)), quad i = 1, 2, dots, m$。
-由随机变量的性质可知：
+- $O A^2$：样本点到原点距离的平方和（由于旋转不改变相对位置，此项为*常数*）。
+- $O A'^2$：样本在 $y_1$ 轴上的投影坐标值平方和，即 *投影方差*（代表保留的信息）。
+- $A A'^2$：样本点到 $y_1$ 轴的垂线距离平方和，即 *投影误差*（代表丢失的信息）。
 
-$ E(y_i) = bold(alpha)_i^T bold(mu), quad i = 1, 2, dots, m $
+由于距离总和常数不变，*最大化投影方差 $O A'^2$* 必然等价于 *最小化投影误差 $A A'^2$*。后续主成分的选取均在此正交与最优化条件下依次进行。
+#image("/assets/image-12.png")
 
-$ op("var")(y_i) = bold(alpha)_i^T bold(Sigma) bold(alpha)_i, quad i = 1, 2, dots, m $
 
-$ op("cov")(y_i, y_j) = bold(alpha)_i^T bold(Sigma) bold(alpha)_j, quad i = 1, 2, dots, m; quad j = 1, 2, dots, m $
+// 假设 $bold(x) = (x_1, x_2, dots, x_m)^T$ 是 $m$ 维随机变量，其均值向量是 $bold(mu)$：
 
-#definition[总体主成分][
-  对于一个线性变换，如果他们满足下列条件：
+// $ bold(mu) = E(bold(x)) = (mu_1, mu_2, dots, mu_m)^T $
 
-  (1) 系数向量 $bold(alpha)_i^T$ 是单位向量，即 $bold(alpha)_i^T bold(alpha)_i = 1, i = 1, 2, dots, m$；
+// 协方差矩阵是 $bold(Sigma)$：
+
+// $ bold(Sigma) = op("cov")(bold(x), bold(x)) = E[(bold(x) - bold(mu)) (bold(x) - bold(mu))^T] $
+
+// 考虑由 $m$ 维随机变量 $bold(x)$ 到 $m$ 维随机变量 $bold(y) = (y_1, y_2, dots, y_m)^T$ 的线性变换：
+
+// $ y_i = bold(alpha)_i^T bold(x) = alpha_(1i) x_1 + alpha_(2i) x_2 + dots + alpha_(m i) x_m $
+
+// 其中，$bold(alpha)_i^T = (alpha_(1i), alpha_(2i), dots, alpha_(m i)), quad i = 1, 2, dots, m$。
+// 由随机变量的性质可知：
+
+// $ E(y_i) = bold(alpha)_i^T bold(mu), quad i = 1, 2, dots, m $
+
+// $ op("var")(y_i) = bold(alpha)_i^T bold(Sigma) bold(alpha)_i, quad i = 1, 2, dots, m $
+
+// $ op("cov")(y_i, y_j) = bold(alpha)_i^T bold(Sigma) bold(alpha)_j, quad i = 1, 2, dots, m; quad j = 1, 2, dots, m $
+
+// #definition[总体主成分][
+//   对于一个线性变换，如果他们满足下列条件：
+
+//   (1) 系数向量 $bold(alpha)_i^T$ 是单位向量，即 $bold(alpha)_i^T bold(alpha)_i = 1, i = 1, 2, dots, m$；
   
-  (2) 变量 $y_i$ 与 $y_j$ 互不相关，即 $op("cov")(y_i, y_j) = 0 (i eq.not j)$；
+//   (2) 变量 $y_i$ 与 $y_j$ 互不相关，即 $op("cov")(y_i, y_j) = 0 (i eq.not j)$；
   
-  (3) 变量 $y_1$ 是 $bold(x)$ 的所有线性变换中方差最大的；$y_2$ 是与 $y_1$ 不相关的 $bold(x)$ 的所有线性变换中方差最大的；一般地，$y_i$ 是与 $y_1, y_2, dots, y_(i-1) (i = 1, 2, dots, m)$ 都不相关的 $bold(x)$ 的所有线性变换中方差最大的，这时分别称 $y_1, y_2, dots, y_m$ 为 $bold(x)$ 的第一主成分、第二主成分、……、第 $m$ 主成分。
+//   (3) 变量 $y_1$ 是 $bold(x)$ 的所有线性变换中方差最大的；$y_2$ 是与 $y_1$ 不相关的 $bold(x)$ 的所有线性变换中方差最大的；一般地，$y_i$ 是与 $y_1, y_2, dots, y_(i-1) (i = 1, 2, dots, m)$ 都不相关的 $bold(x)$ 的所有线性变换中方差最大的，这时分别称 $y_1, y_2, dots, y_m$ 为 $bold(x)$ 的第一主成分、第二主成分、……、第 $m$ 主成分。
+// ]
+
+// 定义中的条件 (1) 表明线性变换是正交变换, $bold(alpha)_1, bold(alpha)_2, dots, bold(alpha)_m$ 是其一组标准正交基:
+// $ bold(alpha)_i^"T" bold(alpha)_j = cases(
+//   1\, & i = j,
+//   0\, & i != j
+// ) $
+
+// 条件 (2) 和条件 (3) 给出了一个求主成分的方法: 第一步, 在 $bold(x)$ 的所有线性变换
+// $ bold(alpha)_1^"T" bold(x) = sum_(i=1)^m alpha_(i 1) x_i $
+// 中, 在 $bold(alpha)_1^"T" bold(alpha)_1 = 1$ 的条件下, 求方差最大的, 得到 $bold(x)$ 的第一主成分; 第二步, 在与 $bold(alpha)_1^"T" bold(x)$ 不相关的 $bold(x)$ 的所有线性变换
+// $ bold(alpha)_2^"T" bold(x) = sum_(i=1)^m alpha_(i 2) x_i $
+// 中, 在 $bold(alpha)_2^"T" bold(alpha)_2 = 1$ 的条件下, 求方差最大的, 得到 $bold(x)$ 的第二主成分; 第 $k$ 步, 在与 $bold(alpha)_1^"T" bold(x), bold(alpha)_2^"T" bold(x), dots, bold(alpha)_(k-1)^"T" bold(x)$ 不相关的 $bold(x)$ 的所有线性变换
+// $ bold(alpha)_k^"T" bold(x) = sum_(i=1)^m alpha_(i k) x_i $
+// 中, 在 $bold(alpha)_k^"T" bold(alpha)_k = 1$ 的条件下, 求方差最大的, 得到 $bold(x)$ 的第 $k$ 主成分; 如此继续下去, 直到得到 $bold(x)$ 的第 $m$ 主成分。
+
+#algorithm("主成分分析 (PCA)")[
+*输入：*样本集 $D = {bold(x)_1, bold(x)_2, dots, bold(x)_m}$；低维空间维数 $d'$。
+
+*输出：*投影矩阵 $bold(W) = (bold(w)_1, bold(w)_2, dots, bold(w)_d')$。
+
+*过程：*
+1. *样本中心化*（消除平移偏差，将数据整体移动到坐标系原点附近）：
+$
+  bold(x)_i arrow l bold(x)_i - 1/m sum_(i=1)^m bold(x)_i
+$
+
+2. *计算样本协方差矩阵*（提取各维度间的相关性与变异程度。设 $bold(X)$ 为中心化后的 $d times m$ 样本矩阵）：
+$
+  bold(C) = bold(X) bold(X)^T
+$
+
+3. *特征值分解*（在原始空间中寻找一组全新的正交坐标轴，使得数据投影后的方差被逐级隔离）：
+  对协方差矩阵 $bold(X) bold(X)^T$ 做特征值分解，求得特征值与对应的特征向量。
+
+4. *提取主成分进行降维*（丢弃包含极小方差的“噪声”维度，保留包含最大信息量的前 $d'$ 个方向）：
+  取最大的 $d'$ 个特征值所对应的特征向量 $bold(w)_1, bold(w)_2, dots, bold(w)_d'$。
 ]
-
-定义中的条件 (1) 表明线性变换是正交变换, $bold(alpha)_1, bold(alpha)_2, dots, bold(alpha)_m$ 是其一组标准正交基:
-$ bold(alpha)_i^"T" bold(alpha)_j = cases(
-  1\, & i = j,
-  0\, & i != j
-) $
-
-条件 (2) 和条件 (3) 给出了一个求主成分的方法: 第一步, 在 $bold(x)$ 的所有线性变换
-$ bold(alpha)_1^"T" bold(x) = sum_(i=1)^m alpha_(i 1) x_i $
-中, 在 $bold(alpha)_1^"T" bold(alpha)_1 = 1$ 的条件下, 求方差最大的, 得到 $bold(x)$ 的第一主成分; 第二步, 在与 $bold(alpha)_1^"T" bold(x)$ 不相关的 $bold(x)$ 的所有线性变换
-$ bold(alpha)_2^"T" bold(x) = sum_(i=1)^m alpha_(i 2) x_i $
-中, 在 $bold(alpha)_2^"T" bold(alpha)_2 = 1$ 的条件下, 求方差最大的, 得到 $bold(x)$ 的第二主成分; 第 $k$ 步, 在与 $bold(alpha)_1^"T" bold(x), bold(alpha)_2^"T" bold(x), dots, bold(alpha)_(k-1)^"T" bold(x)$ 不相关的 $bold(x)$ 的所有线性变换
-$ bold(alpha)_k^"T" bold(x) = sum_(i=1)^m alpha_(i k) x_i $
-中, 在 $bold(alpha)_k^"T" bold(alpha)_k = 1$ 的条件下, 求方差最大的, 得到 $bold(x)$ 的第 $k$ 主成分; 如此继续下去, 直到得到 $bold(x)$ 的第 $m$ 主成分。
 
 #example[
 我们使用一组均值非零的数据。假设有 $n=3$ 个样本，$p=2$ 个特征：
@@ -715,3 +835,28 @@ $ Y &= (1 / sqrt(5) mat(1, 2)) mat(
 ) $
 
 这就是降维后的数据矩阵，原有的 2 维数据被压缩到了 1 维，且保留了最大的方差信息。
+
+=== 核化线性降维
+面对卷曲的流形，只用直线去投影，会把不同层的数据强行“压”在一起，导致颜色混杂，丢失了流形原本的结构。
+
+假设存在一个非线性映射函数 $Phi$，能把原始的低维样本 #mi(`\boldsymbol{x}_i`) 变成高维空间的样本 #mi(`\boldsymbol{z}_i`)，即 #mi(`\boldsymbol{z}_i = \phi(\boldsymbol{x}_i)`)。如果在高维空间里做 PCA，我们原本要求解的目标依然是特征值问题：
+#mitex(`\left( \sum_{i=1}^m \boldsymbol{z}_i \boldsymbol{z}_i^\top \right) \mathbf{W} = \lambda \mathbf{W}`)
+
+#mi(`\mathbf{W}`) 就是高维空间里的主成分方向。
+
+令#mi(`\alpha_i = \frac{1}{\lambda} \boldsymbol{z}_i^\top \mathbf{W}`)，#mitex(`\mathbf{W} = \frac{1}{\lambda} \left( \sum_{i=1}^m \mathbf{z}_i \mathbf{z}_i^\mathrm{T} \right) \mathbf{W} = \sum_{i=1}^m \mathbf{z}_i \frac{\mathbf{z}_i^\mathrm{T} \mathbf{W}}{\lambda} = \sum_{i=1}^m \mathbf{z}_i \boldsymbol{\alpha}_i`)
+
+== 流形学习
+流形是在局部与欧氏空间同胚的空间.抛开*微分几何*而直观地说,在一个小邻域里,我们能用欧式距离来刻画.想在局部建立降维映射关系,然后再设法将局部映射关系推广到全局.#note[
+  我讨厌微分几何
+]
+#figure(
+
+  align(center,image("/assets/104892ea657562cb985bf412ad9262c9_720.png")),
+  caption:[
+    一个流形学习的例子.显然我们不希望距离算成绿色的线段,而是根据红色的线走;所以我们需要通过$k$近邻.这就是著名的ISOMAP算法.他通过算$k$近邻来计算距离矩阵,然后再输入到之前说过的MDS酱味算法.
+  ]
+)
+=== 局部线性嵌入,LLE
+局部线性嵌入试图保持邻域内的线性关系，并使得该线性关系在降维后的空间中继续保持 
+为每个样本$bold(x)_i$找到近邻$Q$,
