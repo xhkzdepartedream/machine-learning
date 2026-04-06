@@ -30,11 +30,14 @@ $
 $
 
 当然实际操作中选前$d'$大的特征值即可.
-== 主成分分析
+== 样本主成分分析：基于（样本）协方差矩阵
+#note[
+总体主成分分析（上帝视角）： 假设你拥有全知全能的视角，完全掌握了数据产生背后的绝对真理（即真实的概率分布）。这是一种*纯理论*的数学推导。
+
+样本主成分分析（凡人视角）： 现实中我们永远无法获得“所有”数据，只能通过观测得到一个有限的数据集。我们利用这批数据去估计主成分。我们在机器学习代码里跑的 PCA，100% 都是样本主成分分析。
+]
 
 主成分分析（principal componentanalysis，PCA）是一种常用的无监督学习方法，这一方法*利用正交变换把由线性相关变量表示的观测数据转换为少数几个由线性无关变量表示的数据*，线性无关的变量称为*主成分*。主成分的个数通常小于原始变量的个数，所以*主成分分析属于降维方法*。主成分分析主要用于发现数据中的基本结构，即数据中变量之间的关系，是数据分析的有力工具，也用于其他机器学习方法的前处理。
-
-=== 总体主成分分析
 
 // 主成分分析中，首先对给定数据进行规范化，使得数据每一变量的平均值为0，方差为1。之后对数据进行正交变换，原来由线性相关变量表示的数据通过正交变换变成由若干个线性无关的新变量表示的数据。新变量是可能的正交变换中变量的方差的和（信息保存）最大的，方差表示在新变量上信息的大小。将新变量依次称为第一主成分、第二主成分等。这就是主成分分析的基本思想。通过主成分分析，可以利用主成分近似地表示原始数据，这可理解为发现数据的“基本结构”：也可以把数据由少数主成分表示，这可理解为对数据降维。
 
@@ -48,12 +51,13 @@ $
 
 // 在数据总体（population）上进行的主成分分析称为总体主成分分析，在有限样本上进行的主成分分析称为样本主成分分析，前者是后者的基础。以下分别予以介绍。
 
-
+=== 算法直觉与流程
 PCA 的几何本质是通过对原坐标系进行*正交变换（旋转）*，寻找一组新的线性无关的坐标轴。这组新轴能够*最大化投影方差*（保留最多信息），或等价地*最小化投影误差*，从而揭示数据的“基本结构”并实现降维。
 
 1. 预处理：数据规范化
 在进行坐标变换前，需对实数空间中的原始数据进行均值归0，方差归1.
-2. 几何直觉：坐标系旋转与方差最大化
+1. 几何直觉：坐标系旋转与方差最大化
+   
 高维数据的分布通常呈现超椭球体。对数据进行 PCA，等价于在原点附近*旋转坐标系*：
 - *第一主成分 ($y_1$)*：选取方差最大的方向作为新坐标系的第一轴（对应*椭圆的长轴*）。此方向上保留了最大的数据信息。
 - *第二主成分 ($y_2$)*：在与 $y_1$ 正交的约束下，选取方差次之的方向作为第二轴（对应*椭圆的短轴*）。
@@ -119,7 +123,7 @@ $ O A^2 = O A'^2 + A A'^2 $
 // $ bold(alpha)_k^"T" bold(x) = sum_(i=1)^m alpha_(i k) x_i $
 // 中, 在 $bold(alpha)_k^"T" bold(alpha)_k = 1$ 的条件下, 求方差最大的, 得到 $bold(x)$ 的第 $k$ 主成分; 如此继续下去, 直到得到 $bold(x)$ 的第 $m$ 主成分。
 
-#algorithm("主成分分析 (PCA)")[
+#algorithm("样本主成分分析：基于（样本）协方差矩阵的特征值分解")[
 *输入：*样本集 $D = {bold(x)_1, bold(x)_2, dots, bold(x)_m}$；低维空间维数 $d'$。
 
 *输出：*投影矩阵 $bold(W) = (bold(w)_1, bold(w)_2, dots, bold(w)_d')$。
@@ -379,48 +383,46 @@ $ bold(Y)_("new") = bold(B) dot bold(alpha)_1 = mat(
 ]
 
 
+#unim[
+=== 深入理解PCA：数学推导、性质与应用考量
+*1. 特征值分解与协方差矩阵对角化*
+  
+设 $lambda_k$ 是协方差矩阵 $bold(Sigma)$ 的第 $k$ 个特征值，$bold(alpha)_k$ 是对应的单位特征向量，即满足：
+$ bold(Sigma) bold(alpha)_k = lambda_k bold(alpha)_k, quad k = 1, 2, dots, m $
 
+将所有特征向量组合成矩阵 $bold(A) = [bold(alpha)_1, bold(alpha)_2, dots, bold(alpha)_m]$，将特征值组合成对角矩阵 $bold(Lambda) = op("diag")(lambda_1, dots, lambda_m)$，上述关系可写为矩阵形式：
+$ bold(Sigma) bold(A) = bold(A) bold(Lambda) $
 
+由于 $bold(A)$ 是正交矩阵，满足 $bold(A)^T bold(A) = bold(A) bold(A)^T = bold(I)$。在等式两边左乘 $bold(A)^T$，得到谱分解公式：
+$ bold(A)^T bold(Sigma) bold(A) = bold(Lambda) quad "和" quad bold(Sigma) = bold(A) bold(Lambda) bold(A)^T $
 
+因此，总体主成分 $bold(y) = bold(A)^T bold(x)$ 的协方差矩阵为：
+$ op("cov")(bold(y)) = op("cov")(bold(A)^T bold(x)) = bold(A)^T bold(Sigma) bold(A) = bold(Lambda) $
+这证明了主成分之间互不相关，且方差为特征值。
 
-  *1. 特征值分解与协方差矩阵对角化*
-  
-  设 $lambda_k$ 是协方差矩阵 $bold(Sigma)$ 的第 $k$ 个特征值，$bold(alpha)_k$ 是对应的单位特征向量，即满足：
-  $ bold(Sigma) bold(alpha)_k = lambda_k bold(alpha)_k, quad k = 1, 2, dots, m $
-  
-  将所有特征向量组合成矩阵 $bold(A) = [bold(alpha)_1, bold(alpha)_2, dots, bold(alpha)_m]$，将特征值组合成对角矩阵 $bold(Lambda) = op("diag")(lambda_1, dots, lambda_m)$，上述关系可写为矩阵形式：
-  $ bold(Sigma) bold(A) = bold(A) bold(Lambda) $
-  
-  由于 $bold(A)$ 是正交矩阵，满足 $bold(A)^T bold(A) = bold(A) bold(A)^T = bold(I)$。在等式两边左乘 $bold(A)^T$，得到谱分解公式：
-  $ bold(A)^T bold(Sigma) bold(A) = bold(Lambda) quad "和" quad bold(Sigma) = bold(A) bold(Lambda) bold(A)^T $
-  
-  因此，总体主成分 $bold(y) = bold(A)^T bold(x)$ 的协方差矩阵为：
-  $ op("cov")(bold(y)) = op("cov")(bold(A)^T bold(x)) = bold(A)^T bold(Sigma) bold(A) = bold(Lambda) $
-  这证明了主成分之间互不相关，且方差为特征值。
+*2. 总方差守恒性质*
 
-  *2. 总方差守恒性质*
-  
-  利用矩阵迹（trace）的性质，总体主成分 $bold(y)$ 的方差之和等于随机变量 $bold(x)$ 的方差之和：
-  $ sum_(i=1)^m "var"(x_i) = op("tr")(bold(Sigma)) = op("tr")(bold(A) bold(Lambda) bold(A)^T) = op("tr")(bold(A)^T bold(A) bold(Lambda)) = op("tr")(bold(Lambda)) = sum_(i=1)^m lambda_i $
+利用矩阵迹（trace）的性质，总体主成分 $bold(y)$ 的方差之和等于随机变量 $bold(x)$ 的方差之和：
+$ sum_(i=1)^m "var"(x_i) = op("tr")(bold(Sigma)) = op("tr")(bold(A) bold(Lambda) bold(A)^T) = op("tr")(bold(A)^T bold(A) bold(Lambda)) = op("tr")(bold(Lambda)) = sum_(i=1)^m lambda_i $
 
-  *3. 因子负荷量 (Factor Loading) 的推导*
-  
-  第 $k$ 个主成分 $y_k$ 与变量 $x_i$ 的相关系数 $rho(y_k, x_i)$ 称为因子负荷量。
-  
-  首先计算 $y_k$ 与 $x_i$ 的协方差。令 $bold(e)_i$ 为基本单位向量（第 $i$ 个分量为 1），则 $x_i = bold(e)_i^T bold(x)$，$y_k = bold(alpha)_k^T bold(x)$。
-  $ op("cov")(y_k, x_i) = op("cov")(bold(alpha)_k^T bold(x), bold(e)_i^T bold(x)) = bold(alpha)_k^T bold(Sigma) bold(e)_i = bold(e)_i^T bold(Sigma) bold(alpha)_k = lambda_k bold(e)_i^T bold(alpha)_k = lambda_k alpha_(i k) $
-  
-  代入相关系数公式：
-  $ rho(y_k, x_i) = frac(op("cov")(y_k, x_i), sqrt("var"(y_k) "var"(x_i))) = frac(lambda_k alpha_(i k), sqrt(lambda_k) sqrt(sigma_(i i))) = frac(sqrt(lambda_k) alpha_(i k), sqrt(sigma_(i i))) $
+*3. 因子负荷量 (Factor Loading) 的推导*
 
-  *4. 因子负荷量的性质*
-  
-  (1) 第 $k$ 个主成分 $y_k$ 与 $m$ 个变量的因子负荷量加权平方和满足：
-  $ sum_(i=1)^m sigma_(i i) rho^2(y_k, x_i) = sum_(i=1)^m sigma_(i i) frac(lambda_k alpha_(i k)^2, sigma_(i i)) = lambda_k sum_(i=1)^m alpha_(i k)^2 = lambda_k bold(alpha)_k^T bold(alpha)_k = lambda_k $
-  
-  (2) $m$ 个主成分与第 $i$ 个变量 $x_i$ 的因子负荷量平方和为 1：
-  由于 $x_i$ 可表示为 $y_1, dots, y_m$ 的线性组合，且 $y_k$ 互不相关，故 $x_i$ 与 $y_1, dots, y_m$ 的相关系数平方和为 1：
-  $ sum_(k=1)^m rho^2(y_k, x_i) = 1 $
+第 $k$ 个主成分 $y_k$ 与变量 $x_i$ 的相关系数 $rho(y_k, x_i)$ 称为因子负荷量。
+
+首先计算 $y_k$ 与 $x_i$ 的协方差。令 $bold(e)_i$ 为基本单位向量（第 $i$ 个分量为 1），则 $x_i = bold(e)_i^T bold(x)$，$y_k = bold(alpha)_k^T bold(x)$。
+$ op("cov")(y_k, x_i) = op("cov")(bold(alpha)_k^T bold(x), bold(e)_i^T bold(x)) = bold(alpha)_k^T bold(Sigma) bold(e)_i = bold(e)_i^T bold(Sigma) bold(alpha)_k = lambda_k bold(e)_i^T bold(alpha)_k = lambda_k alpha_(i k) $
+
+代入相关系数公式：
+$ rho(y_k, x_i) = frac(op("cov")(y_k, x_i), sqrt("var"(y_k) "var"(x_i))) = frac(lambda_k alpha_(i k), sqrt(lambda_k) sqrt(sigma_(i i))) = frac(sqrt(lambda_k) alpha_(i k), sqrt(sigma_(i i))) $
+
+*4. 因子负荷量的性质*
+
+(1) 第 $k$ 个主成分 $y_k$ 与 $m$ 个变量的因子负荷量加权平方和满足：
+$ sum_(i=1)^m sigma_(i i) rho^2(y_k, x_i) = sum_(i=1)^m sigma_(i i) frac(lambda_k alpha_(i k)^2, sigma_(i i)) = lambda_k sum_(i=1)^m alpha_(i k)^2 = lambda_k bold(alpha)_k^T bold(alpha)_k = lambda_k $
+
+(2) $m$ 个主成分与第 $i$ 个变量 $x_i$ 的因子负荷量平方和为 1：
+由于 $x_i$ 可表示为 $y_1, dots, y_m$ 的线性组合，且 $y_k$ 互不相关，故 $x_i$ 与 $y_1, dots, y_m$ 的相关系数平方和为 1：
+$ sum_(k=1)^m rho^2(y_k, x_i) = 1 $
 
 主成分分析的主要目的是降维，所以一般选择 $k$ ($k << m$) 个主成分（线性无关变量）来代替 $m$ 个原有变量（线性相关变量），使问题得以简化，并能保留原有变量的大部分信息。这里所说的信息是指原有变量的方差。为此，先给出一个定理，说明选择 $k$ 个主成分是最优选择。
 
@@ -436,7 +438,11 @@ $ bold(Y)_("new") = bold(B) dot bold(alpha)_1 = mat(
   “最优”是指：在约束为 $k$ 维的前提下，PCA 提供了数学上信息损失最小的线性解。
 ]
 
-#proof[略]
+
+
+
+]
+
 
 在实际问题中，不同变量可能有不同的量纲，直接求主成分有时会产生不合理的结果。为了消除这个影响，常常对各个随机变量实施规范化，使其均值为 0，方差为 1。
 
@@ -530,11 +536,12 @@ $ sum_(k=1)^2 lambda_k^* = 2 = m $
 - 对于变量 $x_2$ ($i=2$)：
   $ rho^2(y_1^*, x_2^*) + rho^2(y_2^*, x_2^*) = 0.75 + 0.25 = 1 $
 验证成立。
-=== 样本主成分分析
 
+
+== 样本主成分分析
 
 #definition[样本主成分][
- 给定样本矩阵 $bold(X)$。样本第一主成分 $y_1 = bold(a)_1^top bold(x)$ 是在 $bold(a)_1^top bold(a)_1 = 1$ 条件下，使 $bold(a)_1^top bold(x)_j (j=1, 2, dots, n)$ 的样本方差 $bold(a)_1^top bold(S) bold(a)_1$ 最大的 $bold(x)$ 的线性变换；样本第二主成分 $y_2 = bold(a)_2^top bold(x)$ 是在 $bold(a)_2^top bold(a)_2 = 1$ 和 $bold(a)_2^top bold(x)_j$ 与 $bold(a)_1^top bold(x)_j (j=1, 2, dots, n)$ 的样本协方差 $bold(a)_2^top bold(S) bold(a)_1 = 0$ 条件下，使 $bold(a)_2^top bold(x)_j (j=1, 2, dots, n)$ 的样本方差 $bold(a)_2^top bold(S) bold(a)_2$ 最大的 $bold(x)$ 的线性变换；一般地，样本第 $i$ 主成分 $y_i = bold(a)_i^top bold(x)$ 是在 $bold(a)_i^top bold(a)_i = 1$ 和 $bold(a)_i^top bold(x)_j$ 与 $bold(a)_k^top bold(x)_j (k < i, j=1, 2, dots, n)$ 的样本协方差 $bold(a)_k^top bold(S) bold(a)_i = 0$ 条件下，使 $bold(a)_i^top bold(x)_j (j=1, 2, dots, n)$ 的样本方差 $bold(a)_i^top bold(S) bold(a)_i$ 最大的 $bold(x)$ 的线性变换。
+ 给定样本矩阵 $bold(X)$。一般地，样本第 $i$ 主成分 $y_i = bold(a)_i^top bold(x)$ 是在 $bold(a)_i^top bold(a)_i = 1$ 和 $bold(a)_i^top bold(x)_j$ 与 $bold(a)_k^top bold(x)_j (k < i, j=1, 2, dots, n)$ 的样本协方差 $bold(a)_k^top bold(S) bold(a)_i = 0$ 条件下，使 $bold(a)_i^top bold(x)_j (j=1, 2, dots, n)$ 的样本方差 $bold(a)_i^top bold(S) bold(a)_i$ 最大的 $bold(x)$ 的线性变换。
 ]
 
 样本主成分与总体主成分具有同样的性质，这从样本主成分的定义容易看出。只要以样本协方差矩阵 $bold(S)$ 代替总体协方差矩阵 $bold(Sigma)$ 即可。样本主成分的性质不再重述。
@@ -550,7 +557,7 @@ $ bold(R) = 1/(n-1) bold(X) bold(X)^top $
 
 样本协方差矩阵 $bold(S)$ 是总体协方差矩阵 $bold(Sigma)$ 的无偏估计，样本相关矩阵 $bold(R)$ 是总体相关矩阵的无偏估计，$bold(S)$ 的特征值和特征向量是 $bold(Sigma)$ 的特征值和特征向量的极大似然估计。
 
-#algorithm[相关矩阵的特征值分解算法][
+#algorithm[样本主成分分析：基于相关矩阵的特征值分解][
   给定样本矩阵 $bold(X)$，利用数据的样本协方差矩阵或者样本相关矩阵的特征值分解进行主成分分析。具体步骤如下：
 
   (1) 对观测数据按式 (16.48) 进行规范化处理，得到规范化数据矩阵，仍以 $bold(X)$ 表示。
@@ -686,7 +693,7 @@ $ S_X = X'^T X' $
 
 假设 $X'$ 的截断奇异值分解为 $X' = U Sigma V^T$，那么 $V$ 的列向量就是 $S_X = X'^T X'$ 的单位特征向量。因此，$V$ 的列向量构成 $X$ 的主成分的正交直角坐标系。于是，求 $X$ 主成分可以通过求 $X'$ 的奇异值分解来实现。具体算法如下。
 
-#algorithm[主成分分析算法][
+#algorithm[样本主成分分析：基于样本的奇异值分解][
 *输入*：$m times n$ 样本矩阵 $X$，其每一行元素的均值为零。 \
 *输出*：$k times n$ 样本主成分矩阵 $Y$。 \
 参数：主成分个数 $k$。
@@ -800,7 +807,7 @@ $ Y &= (1 / sqrt(5) mat(1, 2)) mat(
 
 这就是降维后的数据矩阵，原有的 2 维数据被压缩到了 1 维，且保留了最大的方差信息。
 
-=== 核化线性降维
+== 核化线性降维
 面对卷曲的流形，只用直线去投影，会把不同层的数据强行“压”在一起，导致颜色混杂，丢失了流形原本的结构。
 
 假设存在一个非线性映射函数 $Phi$，能把原始的低维样本 #mi(`\boldsymbol{x}_i`) 变成高维空间的样本 #mi(`\boldsymbol{z}_i`)，即 #mi(`\boldsymbol{z}_i = \phi(\boldsymbol{x}_i)`)。如果在高维空间里做 PCA，我们原本要求解的目标依然是特征值问题：
