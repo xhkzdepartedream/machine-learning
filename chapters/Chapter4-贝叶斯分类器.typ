@@ -1,36 +1,6 @@
 #import "@local/ysz_tools:0.1.0": *
 #show: conf
-#import "@preview/cuti:0.4.0":show-cn-fakebold
-#show:show-cn-fakebold
-#import "@preview/marginalia:0.3.1" as marginalia: note, notefigure, wideblock
-#import "@preview/mitex:0.2.6": *
-#show: marginalia.setup.with(
-  inner: (far: 1mm, width: 1mm, sep: 1mm), //we dont use inner btw
-  outer: (far: 5mm, width: 55mm, sep: 8mm),
-  top: 2.5cm,
-  bottom: 2.5cm,
-  book: false,
-  clearance: 20pt,
-)
-//#show: marginalia.show-frame
-#let a-note-counter = counter("a-note")
-#let note = note.with(counter: a-note-counter, numbering: (..i) => text(
-  weight: 500,
-  font: "JetBrains Mono",
-  size: 7pt,
-  style: "normal",
-  fill: rgb("#ff3a3a"),
-  numbering("a", ..i),
-))
-#set page(header: context if here().page() > 1 {
-  marginalia.header(
-    text-style: (size: 11.5pt, number-type: "old-style"),
-    [],
-    [#smallcaps[Machine Learning] #text(fill: luma(60%))[_CHAPTER 3_]],
-    [Page #counter(page).display("1 of 1", both: true)],
-  )
-})
-#let remark = note
+
 == 贝叶斯决策论 (Bayesian Decision Theory)
 
 若将样本 $x$ 判定为类别 $c_i$，其期望损失为：

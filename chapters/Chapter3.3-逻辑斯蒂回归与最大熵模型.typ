@@ -1,5 +1,5 @@
-#import"../../notes.typ":*
-#show:notes
+#import "@local/ysz_tools:0.1.0": *
+#show: conf
 
 
 == 逻辑斯蒂回归与最大熵模型

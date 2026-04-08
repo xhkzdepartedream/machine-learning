@@ -1,19 +1,5 @@
-// #import "../../notes.typ":*
-// #show:notes
-#import "@local/ysz_tools:0.1.0":*
-#show: conf.with(
-   title:"s"
-)
-#import "@preview/cuti:0.4.0":show-cn-fakebold
-#show:show-cn-fakebold
-//#show ",":"，"
-//#show ":":"："
-#import "@preview/cetz:0.4.1"
-#import "@preview/mitex:0.2.5": *
-#show math.equation: it => {
-  show "xx": $bold(x)$
-  it
-}
+#import "@local/ysz_tools:0.1.0": *
+#show: conf
 == 线性回归
 === 基本概念
 #definition[线性回归][
@@ -162,8 +148,7 @@ $
 $
   L(w)=1/(2m)[sum_(i=1)^m (hat(y_i)-y_i)^2+lambda sum_(j=1)^d |w_j| ]
 $
-
-#note[正则化项设计对比][
+#note[
   - *L2正则化（岭回归）*​​：惩罚项是权重的平方和。这是一个平滑的、凸的函数，其梯度在权重接近零时也会变小。因此，在优化过程中，权重会逐渐缩小，但除非正则化参数λ趋于无穷大，否则权重不会精确为零。这意味着所有特征都会被保留，只是权重值变小了。
   - *L1正则化（Lasso 回归）*​​：惩罚项是权重的绝对值之和。这是一个非平滑的函数，在零点处不可导（有“尖点”）。当使用梯度下降或专用算法（如坐标下降）优化时，这些尖点使得最优解更容易出现在坐标轴上，即某些权重恰好为零。这称为*稀疏性*。
 
@@ -190,6 +175,7 @@ $
   [特征间存在多重共线性], [*L2 (Ridge)*], [L1 倾向于随机保留相关特征中的一个；L2 会平摊权重，更稳健。]
 )
 ]
+
 
 
 === 相关量化指标

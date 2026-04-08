@@ -1,5 +1,5 @@
-#import "../../notes.typ":*
-#show:notes
+#import "@local/ysz_tools:0.1.0": *
+#show: conf
 == 线性判别函数与感知机模型
 === 基本概念
 
