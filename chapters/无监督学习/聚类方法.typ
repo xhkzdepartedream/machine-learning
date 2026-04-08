@@ -498,7 +498,7 @@ LVQ 以一个点代表一个簇，表达能力有限。高斯混合模型（Gaus
 
 高斯混合模型可以理解为一个两阶段生成过程：
 
-+ 以先验概率 #mi(`\alpha_i`) 选择第 #mi(`i`) 个混合成分，此选择由*隐变量* #mi(`z_j \in \{1, \ldots, k\}`) 记录，即 #mi(`P(z_j = i) = \alpha_i`)；
++ 以先验概率 #mi(`\alpha_i`) 选择第 #mi(`i`) 个混合成分。令*隐变量* #mi(`z_i \in \{1, \ldots, k\}`) 表示生成的样本 #mi(`\boldsymbol{x}_i`) 来自第 #mi(`i`) 个混合成分，即 #mi(`P(z_i = i) = \alpha_i`)；
 + 从选定的高斯分量 #mi(`\mathcal{N}(\boldsymbol{\mu}_i, \boldsymbol{\Sigma}_i)`) 中采样，得到观测样本 #mi(`\boldsymbol{x}_j`)。
 
 由于 #mi(`z_j`) 未知，利用贝叶斯定理求 #mi(`z_j`) 的*后验概率*（已观测到 #mi(`\boldsymbol{x}_j`) 后，它来自第 #mi(`i`) 个分量的概率）：
