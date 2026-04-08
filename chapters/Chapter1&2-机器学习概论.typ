@@ -1,5 +1,14 @@
-#import "@local/ysz_tools:0.1.0": *
-#show: conf
+#import "@local/ysz_tools:0.1.0":*
+#show: conf.with(
+   title:"s"
+)
+#import "@preview/cuti:0.4.0":show-cn-fakebold
+#show:show-cn-fakebold
+//#show ",":"，"
+//#show ":":"："
+#import "@preview/cetz:0.4.1"
+#import "@preview/mitex:0.2.5": *
+#counter(page).update(1)
 #let plot(width:100%)= {
    cetz.canvas({
   import cetz.draw: *

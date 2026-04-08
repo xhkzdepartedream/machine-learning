@@ -66,6 +66,6 @@
 给每个模型提供不同的数据子集（Data Subsets），比如自助采样（Bootstrap Sampling）。
 ✅ 举例：Bagging / 随机森林的核心 —— 每棵树训练在不同的 bootstrap 样本上。
 
-#include ("Boosting.typ")
+#include ("Chapter7.2-Boosting.typ")
 
-#include ("Bagging与随机森林.typ")
+#include ("Chapter7.1-Bagging与随机森林.typ")
