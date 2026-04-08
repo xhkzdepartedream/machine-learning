@@ -3,6 +3,7 @@
 #show: conf.with(
   title: "shabi",
 )
+#set math.equation(numbering: "(1)")
 
 == 低维嵌入
 
@@ -856,5 +857,25 @@ $ Y &= (1 / sqrt(5) mat(1, 2)) mat(
   ]
 )
 === 局部线性嵌入,LLE
-局部线性嵌入试图保持邻域内的线性关系，并使得该线性关系在降维后的空间中继续保持 
-为每个样本$bold(x)_i$找到近邻$Q$,
+局部线性嵌入试图保持邻域内的线性关系，并使得该线性关系在降维后的空间中继续保持.为每个样本$bold(x)_i$找到近邻$Q$,然后计算线性重构的系数$bold(w)_i$,也就是
+$
+  min_(i in cal(I))sum_(i=1)^m ||bold(x)_i - sum_(j in Q_i) w_(i j) bold(x)_j||^2 s.t. sum_(j in Q_i) w_(i j) = 1
+$
+得到解
+$
+ w_(i j) = (sum_(k in Q_i)C_(j k)^(-1))/(sum_(l,s in Q_i)C_(l s)^(-1)), C_(j k) eq.delta (bold(x_i)-bold(x_j))^T (bold(x_i)-bold(x_j))
+$<lle>
+
+当然我们想得到一个更低维度的嵌入,而且LLE规定$w$是不变的.所以,只需要考虑把低维度坐标$bold(z)$替换$bold(x)$即可.令
+$
+bold(Z) eq.delta \(z_1,dots,z_m\) in RR^(d' times m),\
+bold(M) eq.delta (bold(I) - bold(W))^T (bold(I) - bold(W))
+$
+则@lle 可以被重写为
+$
+ min_(bold(Z)) tr(bold(Z)^T bold(M) bold(Z)) and bold(Z) bold(Z)^T = bold(I).
+$
+
+== 度量学习
+
+交给YYL
