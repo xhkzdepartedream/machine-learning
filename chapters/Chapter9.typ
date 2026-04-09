@@ -18,10 +18,7 @@
 
 
 #remark[*相似性测度、聚类准则和聚类算法*称为聚类分析的三要素。]
-// 下面这个不知道放哪。——yyl
-// 层次聚类又有聚合（自下而上）和分裂（自上而下）两种方法。
 
-// 聚合法开始将每个样本各自分到一个类，之后将相距最近的两类合并，建立一个新的类，重复此操作直到满足停止条件，得到层次化的类别；分裂法开始将所有样本分到一个类，之后将已有类中相距最远的样本分到两个新的类，重复此操作直到满足停止条件，得到层次化的类别。
 
 // *均值聚类*是基于中心的聚类方法，通过迭代，将样本分到个类中，使得每个样本与其所属类的中心或均值最近，得到个“平坦的”、非层次化的类别，构成对空间的划分。$k$均值聚类的算法于1967年由MacQueen提出。
 
@@ -132,7 +129,7 @@ $
 - 内部指标：完全不知道真实分类，只能通过测量数据点之间的实际物理/几何距离来评价。
 ]
 === 外部指标
-  
+
 通过考察所有样本对 $(x_i, x_j)$（其中 $i < j$），根据它们在 $C$ 和 $C^*$ 中是否属于同一个簇，将其分为四类：
 - $a = |"SS"|$：Same-Same。在聚类结果中属于同簇，在参考模型中也属于同簇。（预测正确）
 - $b = |"SD"|$：Same-Different。在聚类结果中属于同簇，但在参考模型中属于不同簇。（预测错误）
@@ -320,7 +317,7 @@ $
   m _ ( l ) = ( 1 ) / ( n _ ( l ) ) sum _ ( C ( i ) = l ) x _ ( i ) , quad l = 1 , 2 , dots.h.c , k
 $
 
-#algorithm[
+#algorithm("K means聚类")[
   *输入*: 样本集 $D = (x_1, x_2, dots, x_m)$；聚类簇数 $k$.
 
   *输出*: 簇划分 $C = (C_1, C_2, dots, C_k)$.
@@ -390,7 +387,7 @@ k均值的效果不太理想。
 
 
 目标是学得 #mi(`q`) 个 #mi(`n`) 维*原型向量* #mi(`\{\boldsymbol{p}_1, \boldsymbol{p}_2, \ldots, \boldsymbol{p}_q\}`)，每个 #mi(`\boldsymbol{p}_i`) 附带一个预设的类别标记 #mi(`t_i \in \mathcal{Y}`)。#note[
-  事先决定要用 q 个代表点来划分空间，并且每个代表点预先指定它代表哪个类别。比如用 3 个代表点，2 个代表猫、1 个代表狗。]
+  这是说，事先决定要用 q 个代表点来划分空间，并且每个代表点预先指定它代表哪个类别。比如用 3 个代表点，2 个代表猫、1 个代表狗。]
 训练完成后，每个原型向量定义其对应的 *Voronoi 区域*——样本空间中与该原型距离最近的所有点都归入对应的簇。
 
 ==== 算法流程
@@ -405,19 +402,19 @@ k均值的效果不太理想。
   + 随机初始化一组原型向量 ${p_1, p_2, ..., p_q}$
   + *repeat*
   
-    #h(1em) 从 $D$ 中随机取一个样本 $(x_j, y_j)$
+    - 从 $D$ 中随机取一个样本 $(x_j, y_j)$
 
-    #h(1em) 计算 $x_j$ 与每个 $p_i$ 的距离：$d_i = norm(x_j - p_i)$
+    - 计算 $x_j$ 与每个 $p_i$ 的距离：$d_i = norm(x_j - p_i)$
 
-    #h(1em) 找到最近原型：$p^* = arg min_(i in {1,...,q}) d_i$，记其类别标记为 $t^*$
+    - 找到最近原型：$p^* = arg min_(i in {1,...,q}) d_i$，记其类别标记为 $t^*$
 
-    #h(1em) *if* $y_j = t^*$ *then* #h(2em) \# 类别相同，令 $p^*$ 靠近 $x_j$
+    - *if* $y_j = t^*$ *then* #h(2em) \# 类别相同，令 $p^*$ 靠近 $x_j$
 
-    #h(3em) $p' = p^* + eta dot (x_j - p^*)$
+        $p' = p^* + eta dot (x_j - p^*)$
 
-    #h(1em) *else* #h(4.1em) \# 类别不同，令 $p^*$ 远离 $x_j$
+    - *else* #h(4.1em) \# 类别不同，令 $p^*$ 远离 $x_j$
 
-    #h(3em) $p' = p^* - eta dot (x_j - p^*)$
+        $p' = p^* - eta dot (x_j - p^*)$
 #note[
 更新规则的几何解释
 
@@ -448,9 +445,9 @@ k均值的效果不太理想。
 ]
     ]
 
-    #h(1em) *end if*
 
-  #h(1em) 将 $p^*$ 更新为 $p'$
+  3. 将 $p^*$ 更新为 $p'$
+
   *until* 满足停止条件
 
   *输出：* 原型向量 ${p_1, p_2, ..., p_q}$
@@ -495,12 +492,12 @@ LVQ 以一个点代表一个簇，表达能力有限。高斯混合模型（Gaus
 
 ==== 样本生成过程与隐变量
 
-高斯混合模型可以理解为一个两阶段生成过程：
+高斯混合模型的所有样本来源可以理解为一个两阶段生成过程：
+// warning：以下部分未审查，极有可能存在错误！
++ 以先验概率 #mi(`\alpha_i`) 选择第 #mi(`i`) 个混合成分。令*隐变量* #mi(`z_j \in \{1, \ldots, k\}`) 表示生成的样本 #mi(`\boldsymbol{x}_j`) 所来自的混合成分，即 #mi(`P(z_j = i) = \alpha_i`)；
++ 从选定的高斯分量 #mi(`\mathcal{N}(\boldsymbol{\mu}_j, \boldsymbol{\Sigma}_j)`) 中采样，得到观测样本 #mi(`\boldsymbol{x}_j`)。
 
-+ 以先验概率 #mi(`\alpha_i`) 选择第 #mi(`i`) 个混合成分。令*隐变量* #mi(`z_i \in \{1, \ldots, k\}`) 表示生成的样本 #mi(`\boldsymbol{x}_i`) 来自第 #mi(`i`) 个混合成分，即 #mi(`P(z_i = i) = \alpha_i`)；
-+ 从选定的高斯分量 #mi(`\mathcal{N}(\boldsymbol{\mu}_i, \boldsymbol{\Sigma}_i)`) 中采样，得到观测样本 #mi(`\boldsymbol{x}_j`)。
-
-由于 #mi(`z_j`) 未知，利用贝叶斯定理求 #mi(`z_j`) 的*后验概率*（已观测到 #mi(`\boldsymbol{x}_j`) 后，它来自第 #mi(`i`) 个分量的概率）：
+实际上 #mi(`z_j`) 未知，利用贝叶斯定理求 #mi(`z_j`) 的*后验概率*（已观测到的 #mi(`\boldsymbol{x}_j`) 来自第 #mi(`i`) 个分量的概率）：
 
 #mitex(`\gamma_{ji} = p_{\mathcal{M}}(z_j = i \mid \boldsymbol{x}_j) = \frac{P(z_j=i) \cdot p(\boldsymbol{x}_j \mid z_j=i)}{p_{\mathcal{M}}(\boldsymbol{x}_j)} = \frac{\alpha_i \cdot p(\boldsymbol{x}_j \mid \boldsymbol{\mu}_i, \boldsymbol{\Sigma}_i)}{\displaystyle\sum_{l=1}^k \alpha_l \cdot p(\boldsymbol{x}_j \mid \boldsymbol{\mu}_l, \boldsymbol{\Sigma}_l)}`)
 
@@ -547,29 +544,28 @@ LVQ 以一个点代表一个簇，表达能力有限。高斯混合模型（Gaus
 每次迭代都保证对数似然不减，算法收敛至局部最优。
 
 ==== 完整算法伪代码
-
 #algorithm[
-输入：样本集 D = {x₁, x₂, …, xₘ}；高斯混合成分个数 k
+  *输入*：样本集 #mi(`D = \{\boldsymbol{x}_1, \boldsymbol{x}_2, \ldots, \boldsymbol{x}_m\}`)；高斯混合成分个数 #mi(`k`)
 
-过程：
-+ 初始化高斯混合分布的模型参数 {(αᵢ, μᵢ, Σᵢ) | 1 ≤ i ≤ k}
-+ repeat
-+ [E步] for j = 1, …, m do
-+ 根据当前参数计算 γⱼᵢ（各成分生成样本 xⱼ 的后验概率）
-+ end for
-+ [M步] for i = 1, …, k do
-+ 计算新均值向量：μᵢ' = (Σⱼ γⱼᵢ xⱼ) / (Σⱼ γⱼᵢ)
-+ 计算新协方差矩阵：Σᵢ' = (Σⱼ γⱼᵢ (xⱼ-μᵢ)(xⱼ-μᵢ)ᵀ) / (Σⱼ γⱼᵢ)
-+ 计算新混合系数：αᵢ' = (Σⱼ γⱼᵢ) / m
-+ end for
-+ 将模型参数 {(αᵢ, μᵢ, Σᵢ)} 更新为 {(αᵢ', μᵢ', Σᵢ')}
-+ until 满足停止条件
-+ [划簇] Cᵢ = ∅（1 ≤ i ≤ k）
-+ for j = 1, …, m do
-+ 令 λⱼ = argmaxᵢ γⱼᵢ，根据 γⱼᵢ 确定 xⱼ 的簇标记 λⱼ
-+ 将 xⱼ 并入相应的簇：C_{λⱼ} = C_{λⱼ} ∪ {xⱼ}
-+ end for
-+ return 簇划分结果 C = {C₁, C₂, …, C_k}
+  *过程*：
+  + 初始化高斯混合分布的模型参数 #mi(`\{(\alpha_i, \boldsymbol{\mu}_i, \boldsymbol{\Sigma}_i) \mid 1 \leqslant i \leqslant k\}`)
+  + repeat
+  + *[E步]* for #mi(`j = 1, \ldots, m`) do
+  + 根据当前参数计算 #mi(`\gamma_{ji}`)（各成分生成样本 #mi(`\boldsymbol{x}_j`) 的后验概率）
+  + end for
+  + *[M步]* for #mi(`i = 1, \ldots, k`) do
+  + 计算新均值向量：#mi(`\boldsymbol{\mu}_i' = (\sum_j \gamma_{ji} \boldsymbol{x}_j) / (\sum_j \gamma_{ji})`)
+  + 计算新协方差矩阵：#mi(`\boldsymbol{\Sigma}_i' = (\sum_j \gamma_{ji} (\boldsymbol{x}_j - \boldsymbol{\mu}_i)(\boldsymbol{x}_j - \boldsymbol{\mu}_i)^\top) / (\sum_j \gamma_{ji})`)
+  + 计算新混合系数：#mi(`\alpha_i' = (\sum_j \gamma_{ji}) / m`)
+  + end for
+  + 将模型参数 #mi(`\{(\alpha_i, \boldsymbol{\mu}_i, \boldsymbol{\Sigma}_i)\}`) 更新为 #mi(`\{(\alpha_i', \boldsymbol{\mu}_i', \boldsymbol{\Sigma}_i')\}`)
+  + until 满足停止条件
+  + *[划簇]* #mi(`C_i = \varnothing`)（#mi(`1 \leqslant i \leqslant k`)）
+  + for #mi(`j = 1, \ldots, m`) do
+  + 令 #mi(`\lambda_j = \arg\max_i \gamma_{ji}`)，根据 #mi(`\gamma_{ji}`) 确定 #mi(`\boldsymbol{x}_j`) 的簇标记 #mi(`\lambda_j`)
+  + 将 #mi(`\boldsymbol{x}_j`) 并入相应的簇：#mi(`C_{\lambda_j} = C_{\lambda_j} \cup \{\boldsymbol{x}_j\}`)
+  + end for
+  + return 簇划分结果 #mi(`C = \{C_1, C_2, \ldots, C_k\}`)
 ]
 
 ==== 聚类效果
@@ -601,20 +597,423 @@ LVQ 以一个点代表一个簇，表达能力有限。高斯混合模型（Gaus
 
 *软分配 vs. 硬分配*：GMM 的 #mi(`\gamma_{ji}`) 是连续概率值（软分配），每个样本同时"部分属于"多个簇；LVQ 和 k-均值则将样本唯一地分配给一个簇（硬分配）。软分配在簇边界附近更具鲁棒性，也更自然地表达了不确定性。
 
+== 密度聚类
 
-== 层次聚类
-层次聚类假设类别之间存在层次结构，将样本聚到层次化的类中。层次聚类又有聚合（agglomerative）或自下而上（bottom-up）聚类、分裂（divisive）或自上而下（top-down）聚类两种方法。因为每个样本只属于一个类，所以*层次聚类属于硬聚类*。聚合聚类开始将每个样本各自分到一个类，之后将相距最近的两类合并，建立一个新的类，重复此操作直到满足停止条件，得到层次化的类别。分裂聚类开始将所有样本分到一个类，之后将已有类中相距最远的样本分到两个新的类，重复此操作直到满足停止条件，得到层次化的类别。
+=== DBSCAN 聚类密度
 
-聚合聚类需要预先确定下面3个要素：距离或相似度、合并规则和停止条件。
+密度聚类也称为*基于密度的聚类*（density-based clustering），此类算法假设聚类结构能通过*样本分布的紧密程度*来确定。通常情况下，密度聚类算法从样本密度的角度来考察样本之间的可连接性，并基于可连接样本不断扩展聚类簇来获得最终的聚类结果。
 
-这里我们举一个欧氏距离的例子，可以看出聚合层次聚类算法的复杂度是$O(n^3 m)$, 其中$m$是样本的维数，$n$是样本个数。通过使用*优先队列（堆）*或 k-d tree 等数据结构优化，可以将复杂度降低到 $O(n^2 log n)$ 甚至更低，但最原始的朴素实现是 $O(n^3 m)$。：
-#algorithm[
-  *输入*：$n$个样本组成的样本集合及样本之间的距离。
-  *输出*：对样本集合的一个层次化聚类。
+*DBSCAN*是一种基于密度的聚类算法（density-based clustering），其基于一组"邻域"参数（#mi(`\epsilon`)、#mi(`MinPts`)）来刻画样本分布的紧密程度。
 
-  + 计算$n$个样本两两之间的欧氏距离${d_(i j)}$，记作矩阵$D=[d_(i j)]_(n times n)$
-  + 构造$n$个类，每个类只包含一个样本。
-  + 合并类间距最小的两个类，其中最短距离为类间距离，构建一个新类。
-  + 计算新类与当前各类的距离，若类的个数为1，终止计算。否则回到步骤3.
+给定样本集 #mi(`D = \{\boldsymbol{x}_1, \boldsymbol{x}_2, \ldots, \boldsymbol{x}_m\}`)，定义如下几个概念：
+
+#definition[$epsilon$-邻域][
+  对 #mi(`\boldsymbol{x}_j \in D`)，其 #mi(`\epsilon`)-邻域包含样本集 #mi(`D`) 中与 #mi(`\boldsymbol{x}_j`) 的距离*不大于* #mi(`\epsilon`) 的样本（假设为欧氏距离）：
+  
+  #mitex(`N_\epsilon(\boldsymbol{x}_j) = \{\boldsymbol{x}_i \in D \mid \text{dist}(\boldsymbol{x}_i, \boldsymbol{x}_j) \leq \epsilon\}`)
 ]
 
+#definition[核心对象][
+  若 #mi(`\boldsymbol{x}_j`) 的 #mi(`\epsilon`)-邻域至少包含 #mi(`MinPts`) 个样本，则 #mi(`\boldsymbol{x}_j`) 是一个核心对象：
+  
+  #mitex(`|N_\epsilon(\boldsymbol{x}_j)| \geqslant MinPts`)
+]
+
+#definition[密度直达][
+  若 #mi(`\boldsymbol{x}_j`) 位于 #mi(`\boldsymbol{x}_i`) 的 #mi(`\epsilon`)-邻域中，且 #mi(`\boldsymbol{x}_i`) 是核心对象，则称 #mi(`\boldsymbol{x}_j`) 由 #mi(`\boldsymbol{x}_i`) *密度直达*。
+]
+
+#definition[密度可达][
+  对 #mi(`\boldsymbol{x}_i`) 与 #mi(`\boldsymbol{x}_j`)，若存在样本序列 #mi(`\boldsymbol{p}_1, \boldsymbol{p}_2, \ldots, \boldsymbol{p}_n`)，其中 #mi(`\boldsymbol{p}_1 = \boldsymbol{x}_i`)，#mi(`\boldsymbol{p}_n = \boldsymbol{x}_j`)且 #mi(`\boldsymbol{p}_{i+1}`) 由 #mi(`\boldsymbol{p}_i`) 密度直达，则称 #mi(`\boldsymbol{x}_j`) 由 #mi(`\boldsymbol{x}_i`) *密度可达*。
+]
+
+#definition[密度相连][
+  对 #mi(`\boldsymbol{x}_i`) 与 #mi(`\boldsymbol{x}_j`)，若存在 #mi(`\boldsymbol{x}_k`) 使得 #mi(`\boldsymbol{x}_i`) 与 #mi(`\boldsymbol{x}_j`) 均由 #mi(`\boldsymbol{x}_k`) 密度可达，则称 #mi(`\boldsymbol{x}_i`) 与 #mi(`\boldsymbol{x}_j`) *密度相连*。
+]
+
+#note[
+*形象理解*：
+
+- #mi(`\epsilon`) 描述了某一样本的邻域距离阈值
+- #mi(`MinPts`) 描述了某一样本的距离为 #mi(`\epsilon`) 的邻域中样本个数的阈值
+- *密度直达*：就像"密切接触者"——直接在一个邻域内
+- *密度可达*：就像"次密接"——通过中间人间接连接
+- *密度相连*：就像"次次密接"——有一个共同的源头
+
+#figure(image("/assets/image-15.png", width: 60%), caption: "密度直达/可达/相连的概念图示（红色点为核心对象，MinPts = 3")
+
+- 绿色点均为异常点，既不是核心点也不是边界点
+]
+
+=== DBSCAN 聚类簇的定义
+
+基于上述概念，DBSCAN 将"簇"定义为：*由密度可达关系导出的最大的密度相连样本集合*。给定邻域参数（#mi(`\epsilon`)、#mi(`MinPts`)），簇 #mi(`C \subseteq D`) 是满足以下性质的非空样本子集：
+
+1. *连续性*：#mi(`\boldsymbol{x}_i \in C`)，#mi(`\boldsymbol{x}_j \in C`) #mi(`\Rightarrow`) #mi(`\boldsymbol{x}_i`) 与 #mi(`\boldsymbol{x}_j`) 密度相连
+2. *最大性*：#mi(`\boldsymbol{x}_i \in C`)，若 #mi(`\boldsymbol{x}_j`) 由 #mi(`\boldsymbol{x}_i`) 密度可达 #mi(`\Rightarrow`) #mi(`\boldsymbol{x}_j \in C`)
+
+#remark[
+  一个 DBSCAN 的簇里面可以有*一个或者多个核心对象*：
+  
+  - 如果只有一个核心对象，则簇里其他的非核心对象样本都在这个核心对象的 #mi(`\epsilon`)-邻域里
+  - 如果有多个核心对象，则簇里的任意一个核心对象的 #mi(`\epsilon`)-邻域中一定有一个其他的核心对象，否则这两个核心对象无法密度可达。这些核心对象的 #mi(`\epsilon`)-邻域里所有的样本的集合组成的一个 DBSCAN 聚类簇。
+]
+
+=== DBSCAN 聚类步骤
+
+DBSCAN 算法初始任意选择一个核心对象，然后*找到所有这个核心对象能够密度可达的样本集合，即为一个聚类簇*。接着继续选择另一个没有类别的核心对象去寻找密度可达的样本集合，这样就得到另一个聚类簇。*一直运行到所有核心对象都有类别为止*。
+
+从任意核心对象出发，基于密度可达性扩展聚类。完成一簇后再挑选未被选中的核心点重复过程，直至遍历完所有核心点。
+
+==== 算法流程
+
+#algorithm[
+  *输入*：样本集 #mi(`D = \{\boldsymbol{x}_1, \boldsymbol{x}_2, \ldots, \boldsymbol{x}_m\}`)；邻域参数（#mi(`\epsilon`), #mi(`MinPts`))。
+
+  *输出*：簇划分 #mi(`\mathcal{C} = \{C_1, C_2, \ldots, C_k\}`)。
+
+  过程：
+  
+  // 第一阶段：找出所有核心对象
+  + 初始化核心对象集合：#mi(`\Omega = \varnothing`)
+  + for #mi(`j = 1, 2, \ldots, m`) do
+    + 确定样本 #mi(`\boldsymbol{x}_j`) 的 #mi(`\epsilon`)-邻域 #mi(`N_\epsilon(\boldsymbol{x}_j)`)
+    + if #mi(`|N_\epsilon(\boldsymbol{x}_j)| \geqslant MinPts`) then
+      + 将样本 #mi(`\boldsymbol{x}_j`) 加入核心对象集合：#mi(`\Omega = \Omega \cup \{\boldsymbol{x}_j\}`)
+    + end if
+  + end for
+  
+  // 第二阶段：基于核心对象扩展聚类簇
+  + 初始化聚类簇数：#mi(`k = 0`)
+  + 初始化未访问样本集合：#mi(`\Gamma = D`)
+  + while #mi(`\Omega \neq \varnothing`) do
+    + 记录当前未访问样本集合：#mi(`\Gamma_{\text{old}} = \Gamma`)
+    + 随机选取一个核心对象 #mi(`\boldsymbol{o} \in \Omega`)，初始化队列 #mi(`Q = \langle \boldsymbol{o} \rangle`)
+    + #mi(`\Gamma = \Gamma \setminus \{\boldsymbol{o}\}`)
+    + while #mi(`Q \neq \varnothing`) do
+      + 取出队列 #mi(`Q`) 中的首个样本 #mi(`\boldsymbol{q}`)
+      + if #mi(`|N_\epsilon(\boldsymbol{q})| \geqslant MinPts`) then
+        + 令 #mi(`\Delta = N_\epsilon(\boldsymbol{q}) \cap \Gamma`)
+        + 将 #mi(`\Delta`) 中的样本加入队列 #mi(`Q`)
+        + #mi(`\Gamma = \Gamma \setminus \Delta`)
+      + end if
+    + end while
+    + #mi(`k = k + 1`)，生成聚类簇 #mi(`C_k = \Gamma_{\text{old}} \setminus \Gamma`)
+    + #mi(`\Omega = \Omega \setminus C_k`)
+  + end while
+]
+
+#unim[
+*算法执行过程示意*：
+
+// #figure(image("/fig/DBSCAN_执行过程.png", width: 60%), caption: "DBSCAN 聚类算法的执行过程动画示意（#mi(`\epsilon = 1.00`)，#mi(`MinPts = 4`))")
+// ]
+
+// #figure(image("/fig/DBSCAN_Cluster_Process.png", width: 60%), caption: "DBSCAN 聚类过程可视化（月亮形数据集)")
+]
+
+=== DBSCAN 聚类分析
+
+==== 参数对聚类结果的影响
+
+DBSCAN 算法的性能高度依赖于两个参数 #mi(`\epsilon`) 和 #mi(`MinPts`) 的选择。不同参数组合会导致截然不同的聚类结果。
+
+// #figure(
+//   grid(
+//     columns: 4,
+//     rows: 2,
+//     column-gutter: 4pt,
+//     row-gutter: 4pt,
+//     image("/fig/DBSCAN_eps_0.05.png"),
+//     image("/fig/DBSCAN_eps_0.1_minpts_5.png"),
+//     image("/fig/DBSCAN_eps_0.1_cluster_3.png"),
+//     image("/fig/DBSCAN_eps_0.1_minpts_10.png"),
+//     image("/fig/DBSCAN_eps_0.15.png"),
+//     image("/fig/DBSCAN_eps_0.2.png"),
+//     image("/fig/DBSCAN_minpts_15.png"),
+//     image("/fig/DBSCAN_minpts_20.png"),
+//   ),
+//   caption: "不同参数下的 DBSCAN 聚类结果对比"
+// )
+
+#table(
+  columns: 4,
+  [参数设置], [聚类数], [效果分析], [原因],
+  [#mi(`\epsilon = 0.05`), #mi(`MinPts = 5`)], [38], [过碎], [#mi(`\epsilon`) 太小，邻域过小，难以形成密度可达链],
+  [#mi(`\epsilon = 0.1`), #mi(`MinPts = 5`)], [5], [较合理], [参数适中，能正确识别两个环形簇],
+  [#mi(`\epsilon = 0.15`), #mi(`MinPts = 5`)], [3], [偏少], [#mi(`\epsilon`) 增大，两个环开始合并],
+  [#mi(`\epsilon = 0.2`), #mi(`MinPts = 5`)], [2], [过少], [#mi(`\epsilon`) 太大，所有点连成一个大簇],
+  [#mi(`\epsilon = 0.1`), #mi(`MinPts = 10`)], [3], [较合理], [增大 #mi(`MinPts`) 使簇更紧密],
+  [#mi(`\epsilon = 0.1`), #mi(`MinPts = 15`)], [7], [过碎], [#mi(`MinPts`) 太大，核心对象减少],
+  [#mi(`\epsilon = 0.1`), #mi(`MinPts = 20`)], [17], [过碎], [核心对象进一步减少，簇被割裂],
+)
+
+#note[
+  *参数选择经验*：
+  
+  - #mi(`\epsilon`) *过小* #mi(`\rightarrow`) 簇数过多，大部分点被识别为噪声
+  - #mi(`\epsilon`) *过大* #mi(`\rightarrow`) 簇数过少，多个簇被合并
+  - #mi(`MinPts`) *过小* #mi(`\rightarrow`) 容易将噪声误判为核心对象
+  - #mi(`MinPts`) *过大* #mi(`\rightarrow`) 核心对象减少，簇被割裂
+  
+  *实用技巧*：通常先固定 #mi(`MinPts`)（经验值 4~10），然后通过绘制 K-距离图（K-distance graph）来选择合适的 #mi(`\epsilon`) 值。
+]
+
+==== DBSCAN 算法特点
+
+一般来说，DBSCAN 算法有以下几个特点：
+
+#table(
+  columns: 2,
+  [特点], [说明],
+  [需要确定参数], [需要提前确定 #mi(`\epsilon`) 和 #mi(`MinPts`) 值],
+  [无需预设簇数], [*不需要*提前设置聚类类别的个数（与 K-means 的关键区别）],
+  [对初值不敏感], [对初始核心对象选取不敏感],
+  [对噪声不敏感], [能有效识别并处理异常点/噪声],
+  [密度不均效果差], [对*密度不均*的数据聚合效果不好],
+)
+
+#unim[
+*DBSCAN 与 K-means 的对比*：
+
+| 特性 | K-means | DBSCAN |
+|------|---------|--------|
+| 簇形状 | 球形/凸形 | 任意形状 |
+| 簇数 | 需预先指定 | 自动确定 |
+| 噪声处理 | 无法处理 | 能识别噪声 |
+| 参数 | 簇数 #mi(`k`) | #mi(`\epsilon`), #mi(`MinPts`) |
+| 密度不均 | 效果好 | 效果差 |
+| 复杂度 | #mi(`O(tkmn)`) | #mi(`O(mn)`) 或使用空间索引 #mi(`O(n \log n)`) |
+]
+
+=== 算法复杂度分析
+
+DBSCAN 算法的时间复杂度主要取决于邻域查询的效率：
+
+- *朴素实现*：对每个样本计算与所有其他样本的距离，复杂度为 #mi(`O(m^2)`)，其中 #mi(`m`) 为样本数
+- *使用空间索引*（如 k-d tree、R-tree）：可将复杂度降至 #mi(`O(m \log m)`)
+- *最坏情况*：当所有点都是核心对象且密度相连时，仍需遍历所有点对，复杂度退化为 #mi(`O(m^2)`)
+
+空间复杂度为 #mi(`O(m)`)，主要用于存储样本集、核心对象集合和聚类结果。
+
+=== 应用场景与局限性
+
+==== 适用场景
+
+1. *簇形状不规则*：数据呈现非球形、非凸形的簇结构
+2. *含噪声数据*：数据集中存在异常点或噪声，需要鲁棒的聚类方法
+3. *簇数未知*：无法预先确定聚类簇的个数
+4. *密度可分*：不同簇之间存在密度差异，簇内密度相对均匀
+
+==== 局限性
+
+1. *密度不均*：当数据集中不同簇的密度差异较大时，难以用一组参数同时处理好所有簇
+2. *高维数据*：在高维空间中，"距离"的概念变得模糊（维度灾难），#mi(`\epsilon`) 的选择变得困难
+3. *参数敏感*：#mi(`\epsilon`) 和 #mi(`MinPts`) 的选择对结果影响显著，需要经验或交叉验证
+4. *边界点归属*：边界点可能被多个簇共享，DBSCAN 通常将其随机分配给最先发现的簇
+
+#remark[
+  *改进算法*：针对 DBSCAN 的局限性，研究者提出了多种改进算法：
+  
+  - *OPTICS*：通过可达距离图展示不同密度下的聚类结构，避免了单一参数选择的困难
+  - *HDBSCAN*：层次 DBSCAN，自动确定参数，能处理密度不均的数据
+  - *DENCLUE*：基于密度分布函数的聚类方法
+]
+
+
+== 层次聚类
+
+=== 层次聚类思想
+
+层次聚类（Hierarchical Clustering）假设类别之间存在层次结构，将样本聚到层次化的类中。因为每个样本只属于一个类，所以*层次聚类属于硬聚类*。
+
+层次聚类算法可以*自上而下*或*自下而上*实现：
+
+#table(
+  columns: 3,
+  [方法], [方向], [核心思想],
+  [凝聚式（agglomerative）], [自下而上], [将每个对象作为单独的一组，然后根据同类相近、异类相异的原则，合并对象，直到所有的组合并成一个，或达到一个终止条件为止],
+  [分裂式（divisive）], [自上而下], [将所有的对象置于一类，在迭代的每一步中，一个类不断地分为更小的类，直到每个对象在单独的一个类中，或达到一个终止条件],
+)
+
+// #figure(
+//   grid(
+//     columns: 2,
+//     column-gutter: 8pt,
+//     image("/fig/层次聚类_散点图.png"),
+//     image("/fig/层次聚类_树状图.png"),
+//   ),
+//   caption: "层次聚类示意图（左：样本分布；右：对应的树状图 Dendrogram）"
+// )
+
+层次聚类其实是一组*有依赖关系*的聚类，后一聚类类依赖前一聚类结果，是在前一聚类结果的基础上，按照一定规则进行新的聚类。因为有依赖关系，因此这一组聚类就形成一个*树状结构*。
+
+#remark[
+  凝聚式层次聚类需要预先确定下面3个要素：
+  1. *距离或相似度*：如何度量样本或类之间的距离
+  2. *合并规则*：选择哪两个类进行合并
+  3. *停止条件*：何时终止聚类过程
+]
+
+=== 凝聚式层次聚类算法
+
+以下讨论的是*凝聚式层次聚类法*。
+
+==== 算法描述
+
+凝聚式层次聚类的核心思想是：从每个样本自成一类开始，逐步合并距离最近的两个类，直到满足停止条件。
+
+#algorithm[
+  *输入*：样本集合 #mi(`D = \{\boldsymbol{x}_1, \boldsymbol{x}_2, \ldots, \boldsymbol{x}_N\}`)；停止条件。
+
+  *输出*：对样本集合的一个层次化聚类（树状结构）。
+
+  过程：
+  
+  // 初始化
+  + N个初始模式样本自成一类，即建立N类：#mi(`G_1(0), G_2(0), \ldots, G_N(0)`)
+  + 计算各类之间（即各样本间）的距离，得一 #mi(`N \times N`) 维距离矩阵 #mi(`\boldsymbol{D}(0)`)
+  
+  // 迭代合并
+  + 假设已求得距离矩阵 #mi(`\boldsymbol{D}(n)`)（#mi(`n`) 为逐次聚类合并的次数），找出 #mi(`\boldsymbol{D}(n)`) 中的最小元素，将其对应的两类合并为一类。由此建立新的分类：#mi(`G_1(n+1), G_2(n+1), \ldots`)
+  + 再次计算：经过合并后，各个类别之间的距离，得 #mi(`\boldsymbol{D}(n+1)`)。显然，#mi(`\boldsymbol{D}(n+1)`) 的维数是 #mi(`\boldsymbol{D}(n)`) 的维数减一。
+  + 跳至上一步，重复计算及合并。
+  
+  // 结束条件（满足其一即可）
+  + *取距离阈值 #mi(`T`)*：当 #mi(`\boldsymbol{D}(n)`) 的最小分量*超过给定值 #mi(`T`)* 时（即：当前各聚类类间的距离，都足够大），算法停止。所得即为聚类结果。
+  + *不设阈值*：一直将全部样本聚成一类为止，输出聚类的分级树（得到全部可能的聚类结果——谱系聚类的名称由来）。
+]
+
+这里我们举一个欧氏距离的例子，可以看出聚合层次聚类算法的复杂度是 #mi(`O(n^3 m)`)，其中 #mi(`m`) 是样本的维数，#mi(`n`) 是样本个数。通过使用*优先队列（堆）*或 k-d tree 等数据结构优化，可以将复杂度降低到 #mi(`O(n^2 \log n)`) 甚至更低，但最原始的朴素实现是 #mi(`O(n^3 m)`)。
+
+#unim[
+*关键点理解*：
+
+- 层次聚类的每一次合并都*依赖前一次的结果*，因此形成一个不可逆的树状结构
+- 一旦两个类被合并，就无法再分开（这是与 K-means 的本质区别）
+- 最终得到的树状图（Dendrogram）可以在任意高度"切割"，得到不同粒度的聚类结果
+]
+
+=== 类间距离计算方法
+
+层次聚类最关键的一步就是*计算两个类簇的相似度*。定义类间距离的方法不同，分类结果会不太一致。
+
+==== 最短距离法（单链距离法）
+
+如 #mi(`H`)、#mi(`K`) 是两个聚类，则两类间的最短距离定义为：
+
+#mitex(`D_{HK} = \min \{ D(\boldsymbol{X}_H, \boldsymbol{X}_K) \} \quad \boldsymbol{X}_H \in H, \boldsymbol{X}_K \in K`)
+
+其中 #mi(`D(\boldsymbol{X}_H, \boldsymbol{X}_K)`) 为 #mi(`H`) 类中的某个样本 #mi(`\boldsymbol{X}_H`) 和 #mi(`K`) 类中的某个样本 #mi(`\boldsymbol{X}_K`) 之间的欧氏距离。
+
+#mi(`D_{HK}`)：#mi(`H`) 类中所有样本与 #mi(`K`) 类中所有样本之间的最小距离。
+
+若 #mi(`K`) 类由 #mi(`I`) 和 #mi(`J`) 两类合并而成，且 #mi(`H`) 与 #mi(`I`)、#mi(`H`) 与 #mi(`J`) 的距离，已先期算出，则得到*递推公式*：
+
+#mitex(`D_{HK} = \min \{ D_{HI}, D_{HJ} \}`)
+
+#unim[
+*特点*：最短距离法的*包容性极强*——只要两个簇中有一对样本距离足够近，就会将两个簇合并。这可能导致"链式效应"（chaining effect），即簇被拉得很长。
+]
+
+==== 最长距离法（全链距离法）
+
+#mitex(`D_{HK} = \max \{ D(\boldsymbol{X}_H, \boldsymbol{X}_K) \} \quad \boldsymbol{X}_H \in H, \boldsymbol{X}_K \in K`)
+
+若 #mi(`K`) 类由 #mi(`I`)、#mi(`J`) 两类合并而成，则
+
+#mitex(`
+\begin{aligned}
+D_{HI} &= \max \{ D(\boldsymbol{X}_H, \boldsymbol{X}_I) \} \quad \boldsymbol{X}_H \in H, \boldsymbol{X}_I \in I \\
+D_{HJ} &= \max \{ D(\boldsymbol{X}_H, \boldsymbol{X}_J) \} \quad \boldsymbol{X}_H \in H, \boldsymbol{X}_J \in J
+\end{aligned}
+`)
+
+有递推公式：
+
+#mitex(`D_{HK} = \max \{ D_{HI}, D_{HJ} \}`)
+
+#unim[
+*特点*：最长距离法*只要存在缺点就坚决不合并*——只有当两个簇中所有样本对之间的距离都较小时，才会合并。这倾向于产生紧凑的、球形的簇。
+]
+
+==== 类平均距离法（组平均距离法）
+
+#mitex(`D_{HK} = \sqrt{ \frac{1}{n_H n_K} \sum_{i \in H} \sum_{j \in K} d_{ij}^2 }`)
+
+其中 #mi(`d_{ij}^2`)：#mi(`H`) 类任一样本 #mi(`\boldsymbol{X}_i`) 和 #mi(`K`) 类任一样本 #mi(`\boldsymbol{X}_j`) 之间的欧氏距离平方。
+
+若 #mi(`K`) 类由 #mi(`I`) 和 #mi(`J`) 类合并产生，则递推式为：
+
+#mitex(`D_{HK} = \sqrt{ \frac{n_I}{n_I + n_J} D_{HI}^2 + \frac{n_J}{n_I + n_J} D_{HJ}^2 }`)
+
+#unim[
+*特点*：均连接法是*从全局出发顾全大局的一种度量*——考虑了两个簇中所有样本对的平均距离，兼顾了单链接和全链接的特点。
+]
+
+#note[
+  实际问题中常用几种不同的方法，比较分类结果，从而选择一个比较切合实际的分类。
+  
+  *三种方法的直观对比*：
+  
+  - *单链接*：看两个簇"最近"的两个点——容易合并，但可能产生链式效应
+  - *全链接*：看两个簇"最远"的两个点——谨慎合并，簇更紧凑
+  - *均链接*：看两个簇所有点的"平均"距离——折中方案，兼顾全局
+]
+
+=== AGNES聚类方法
+
+AGNES（AGglomerative NESting）聚类是一种采用*自底向上聚合策略*的层次聚类算法。该算法通过不断合并距离最近的聚类簇，直到达到预设的聚类簇个数或满足其他停止条件为止。
+
+==== AGNES流程
+
+假设有 #mi(`m`) 个待聚类的样本：
+
+1. *初始化*：把每个样本归为一簇，计算每两个簇之间的距离，也就是样本与样本之间的相似度
+2. *合并*：寻找各个簇之间最近的两个簇，把他们归为一类（簇的总数减少一个）
+3. *更新*：重新计算新生成的这个簇与各个旧簇之间的*相似度*
+4. *重复*：重复步骤2和3直到所有样本点都归为一簇，结束
+
+==== 类簇相似度度量的三种方式
+
+#table(
+  columns: 2,
+  [方法], [定义与公式],
+  [单链接（single-linkage）], [取类间最小距离 #mitex(`d_{\min}(C_i, C_j) = \min_{\boldsymbol{x} \in C_i, \boldsymbol{z} \in C_j} \text{dist}(\boldsymbol{x}, \boldsymbol{z})`)],
+  [全链接（complete-linkage）], [取类间最大距离 #mitex(`d_{\max}(C_i, C_j) = \max_{\boldsymbol{x} \in C_i, \boldsymbol{z} \in C_j} \text{dist}(\boldsymbol{x}, \boldsymbol{z})`)],
+  [均链接（average-linkage）], [取类间两两的平均距离 #mitex(`d_{\text{avg}}(C_i, C_j) = \frac{1}{|C_i||C_j|} \sum_{\boldsymbol{x} \in C_i} \sum_{\boldsymbol{z} \in C_j} \text{dist}(\boldsymbol{x}, \boldsymbol{z})`)],
+)
+
+#remark[
+  *三种链接方法的特点总结*：
+  
+  - *单链接*：*包容性极强*——容易合并，对噪声敏感
+  - *全链接*：*只要存在缺点就坚决不合并*——对异常值敏感，簇更紧凑
+  - *均链接*：*从全局出发顾全大局*——折中方案，鲁棒性较好
+]
+
+=== 层次聚类方法的特点
+
+#table(
+  columns: 2,
+  [特点类型], [说明],
+  [无需指定簇数], [层次聚类算法*不要求我们指定聚类的数量*，我们甚至可以选择哪个聚类看起来最好],
+  [对距离度量的选择], [该算法对距离度量的选择*不敏感*],
+  [可恢复层次结构], [当底层数据具有层次结构时，*可以恢复层次结构*],
+  [时间复杂度高], [层次聚类的优点是以*低效率*为代价的，通常具有 #mi(`O(n^3)`) 的时间复杂度，与 k-means 和高斯混合模型的线性时间复杂度不同],
+)
+
+#unim[
+*层次聚类 vs. 原型聚类*：
+
+- *层次聚类*：产生树状结构，可以灵活选择聚类粒度；但计算开销大，不适合大规模数据
+- *原型聚类*（K-means、LVQ、GMM）：产生"平坦的"划分；计算效率高，但需要预设簇数
+]
+
+=== 延伸阅读：复杂网络的社区发现
+
+近20年来，*复杂网络*（complex network）研究广泛，是复杂系统的抽象。人们发现复杂网络具有一定的*社区结构*，即复杂网络并不是一大批性质完全相同的节点随机连接在一起，也不是各种类型的节点之间不相关的随意链接，而是"乱中有序"——*相同类型节点之间连接较多，构成一个一个的小社区*（Community）。
+
+// #figure(image("/fig/复杂网络_社区发现.png", width: 70%), caption: "复杂网络的社区结构（左：原始网络；右：社区划分结果）")
+
+层次聚类的树状结构天然适合社区发现任务：通过在不同高度切割树状图，可以得到不同粒度的社区划分。
