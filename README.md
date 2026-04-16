@@ -19,4 +19,8 @@
 | Chapter7.2-Boosting.typ | 4.5 |同上|
 | Chapter8-降维与度量学习.typ |5 |确认无误。|
 | Chapter8.1-k近邻法.typ |4 |废话太多。|
-| Chapter9.typ |正在施工ing... |正在施工ing...  |
+| Chapter9.typ |ysz给我干活儿！！！！！ |正在施工...|
+| Chapter10.typ |正在施工，估计是2分 |正在施工...|
+| Chapter11.typ |正在施工，估计是2分 |正在施工...|
+
+fuck ML.——yyl
