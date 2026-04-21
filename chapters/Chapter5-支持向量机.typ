@@ -1,5 +1,8 @@
 #import "@local/ysz_tools:0.1.0": *
-#show: conf
+
+#show: conf.with(
+  title: "shabi",
+)
 
 == 支持向量机
 支持向量机(support vector machine, SVM)是一种二类分类模型,它的基本模型是定义在特征空间上的*间隔最大*的线性分类器,间隔最大使他有别于感知机；支持向量机还包括核技巧,这使它成为实质上的非线性分类器.
