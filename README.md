@@ -19,6 +19,6 @@
 | Chapter8-降维与度量学习.typ |5 |确认无误。| N/A |
 | Chapter8.1-k近邻法.typ |4 |废话太多。| zmy |
 | Chapter9.typ |ysz给我干活儿！！！！！ |...| ysz |
-| Chapter10.typ |...|...| yyl |
+| Chapter10.typ |5|2026-05-31 done| yyl |
 | Chapter11.typ |...|...| yyl |
 | Chapter12.typ |...|...| yyl |

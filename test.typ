@@ -1,40 +1,7 @@
-=== AdaBoost 算法的数学本质
+#set page(paper: "a4")
 
-AdaBoost 的所有公式（系数 $alpha_m$ 的计算、权值 $w$ 的更新）并非凭空捏造，其本质是在进行 *前向分步加法建模 (Forward Stagewise Additive Modeling, FSAM)*，旨在最小化 *指数损失函数*：
-$ L(y, f(x)) = exp(-y f(x)) $
-其中 $y in {-1, +1}$，$f(x) = sum_(m=1)^M alpha_m G_m(x)$ 是强分类器的输出值。
-
-*直观理解：* 如果 $y$ 和 $f(x)$ 符号相同（分类正确）且 $|f(x)|$ 很大（置信度高），则 $-y f(x)$ 为很大的负数，损失 $L arrow 0$；反之，损失会呈指数级爆炸增长。
-
-#remark[
-  AdaBoost 的迭代过程，实际上是在使用贪心算法，一步步地寻找基本分类器 $G_m$ 和系数 $alpha_m$，使得整体的指数损失最小化。
-]
-
-*为什么 $alpha_m = 1/2 ln((1-e_m)/e_m)$？*
-
-这个公式是损失函数的 *解析解 (Analytical Solution)*。假设在第 $m$ 轮，我们已有 $f_(m-1)(x)$，现在寻找最佳的 $alpha$ 和 $G(x)$ 以最小化当前总损失：
-
-$ L(alpha, G) = sum_(i=1)^N exp(-y_i (f_(m-1) (x_i) + alpha G(x_i))) = sum_(i=1)^N tilde(w)_(m i) exp(-y_i alpha G(x_i)) $
-
-这里的 $tilde(w)_(m i) = exp(-y_i f_(m-1) (x_i))$ 即第 $m$ 轮的样本权重（非归一化）。假设已找到最优 $G_m(x)$，将样本分为"正确"和"错误"两组求解 $alpha$：
-
-$ L(alpha) = (1 - e_m) e^(-alpha) + e_m e^(alpha) $
-
-对 $alpha$ 求导并令其为 0，即得：
-$ alpha = 1/2 ln(frac(1 - e_m, e_m)) $
-这保证了在 $G_m$ 选定后，$alpha_m$ 能让指数损失沿该方向达到极小值。
-
-*权值更新的本质：函数空间梯度下降*
-
-权值更新公式 $w_(m+1, i) = w_(m, i) exp(-alpha_m y_i G_m (x_i))$ 递归展开后为：
-$ w_(m+1, i) = exp(-y_i f_m (x_i)) $
-
-这意味着样本权值在数值上正比于该样本在当前模型下的 *指数损失*。每一轮的弱分类器 $G_m$，实际上是在拟合损失函数对于当前模型 $f_(m-1)$ 的 *负梯度方向*。这是一种 *函数空间 (Function Space) 中的梯度下降*，而不仅仅是参数调整。
-
-*为什么不直接优化 0/1 损失？*
-
-0/1 损失（分类错误率）是不连续、非凸的，极难优化（NP-hard）。指数损失函数 $e^(-y f(x))$ 是 0/1 损失 $I(y != "sign"(f(x)))$ 的 *光滑凸上界*。通过不断压低这个"上界"，间接迫使分类错误率趋于 0。
-
-#remark[
-  *一句话总结：* AdaBoost 是在以弱分类器为基底的函数空间中，利用指数损失函数的凸性，通过贪心策略进行的最速下降优化过程。
-]
+$ x_(k+1)^i = cases(
+  z^i - lambda/L &"if" lambda/L < z^i,
+  0 &"if" |z^i| <= lambda/L,
+  z^i + lambda/L &"if" z^i < -lambda/L
+) $
