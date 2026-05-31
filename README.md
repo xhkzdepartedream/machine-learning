@@ -2,9 +2,8 @@
 
 使用本仓库内容前，请阅读并遵守LICENSE: [license.typ](license.typ)
 
-## 4.8
-对现有笔记评级如下。完成度为取值为1~5，1为未完成（raw），5为已完成。
-
+## 5.31
+ddl：6.7
 | 文件名 | 评分 | 评价 | 负责人 |
 | --- | --- | --- | --- |
 | Chapter1&2-机器学习概论.typ |3 | 大体框架基本正确合理，但废话太多；需要仔细检查PPT内所有内容是否不重不漏。 | ysz |
@@ -22,3 +21,9 @@
 | Chapter10.typ |5|2026-05-31 done| yyl |
 | Chapter11.typ |...|...| yyl |
 | Chapter12.typ |...|...| yyl |
+
+## Remark
+1. typst_mitex_daemon.py 会自动将markdown文本的$$ ... $$ -> #mitex(` ... `)，将 $...$ -> #mi(` `)，便于复制AI的回复。
+2. #unim[] 用于标记你认为不太可能考查的部分。
+3. #algorithm #remark #note #problem可自行使用。
+4. 完成任务后记得修改README同步进度。
