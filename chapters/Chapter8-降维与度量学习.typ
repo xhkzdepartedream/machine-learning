@@ -1,8 +1,6 @@
 #import "@local/ysz_tools:0.1.0": *
 
-#show: conf.with(
-  title: "shabi",
-)
+#show: conf.with(title: "shabi")
 #set math.equation(numbering: "(1)")
 
 == 低维嵌入

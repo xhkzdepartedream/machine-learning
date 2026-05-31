@@ -106,7 +106,7 @@ $ op("Var")(1/T sum h_i (x)) = rho sigma^2 + (1-rho)/T sigma^2 $
 $ op("Var")(overline(X)) = op("Var")(1/T sum_(i=1)^T X_i) = 1/T^2 op("Var")(sum_(i=1)^T X_i) $
 
 展开求和项的方差：
-$ op("Var")(sum_(i=1)^T X_i) = sum_(i=1)^T op("Var")(X_i) + sum_(i != j) op("Cov")(X_i, X_j) $
+$ op("Var")(sum_(i=1)^T X_i) = sum_(i=1)^T op("Var")(X_i) + sum_(i eq.not j) op("Cov")(X_i, X_j) $
 
 1. *方差项*（对角线元素）：共有 $T$ 个项。假设每棵树的方差相同，即 $op("Var")(X_i) = sigma^2$。
     $ sum_(i=1)^T op("Var")(X_i) = T sigma^2 $
