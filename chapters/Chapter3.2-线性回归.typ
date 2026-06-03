@@ -5,7 +5,7 @@
 #definition[线性回归][
 线性回归（linear regression）是利用称为线性回归方程的最小二乘函数对一个或多个自变量和因变量之间关系进行建模的一种回归分析。这种函数是一个或多个称为回归系数的模型参数的线性组合。只有一个自变量的情况称为简单回归，大于一个自变量情况的叫做多元回归（multivariable linear regression）。
 
-给定数据集$D={("xx"_1,y_1),(x_2,y_2),dots,(x_m,y_m)}$, 样本空间由$d$维向量张成, $x_i=(x_"i1",x_"i2",dots,x_"id")^T, y_i in RR$, 则：
+给定数据集$D={(x_1,y_1),(x_2,y_2),dots,(x_m,y_m)}$, 样本空间由$d$维向量张成, $x_i=(x_"i1",x_"i2",dots,x_"id")^T, y_i in RR$, 则：
 
 线性回归方程为：
 $
@@ -44,51 +44,51 @@ $
 
 
 
-// #note[矩阵求导方法][
-// 方法一：展开求导法 (Standard Expansion)
+#note[
+方法一：展开求导法 (Standard Expansion)
 
-// 这是最稳健的方法，核心是将矩阵运算展开成多项式形式，类比标量求导。
-// 展开矩阵乘法：
-// 利用转置性质 $(bold(A) - bold(B))^T = bold(A)^T - bold(B)^T$，将式子展开：
-// $ L(bold(w)) &= (bold(y)^T - bold(w)^T bold(X)^T) (bold(y) - bold(X) bold(w))
-// &= bold(y)^T bold(y) - underbrace(bold(y)^T bold(X) bold(w), "标量 A") - underbrace(bold(w)^T bold(X)^T bold(y), "标量 B") + bold(w)^T bold(X)^T bold(X) bold(w) $
-// 合并同类项：
-// 注意 $bold(y)^T bold(X) bold(w)$ 的结果是一个实数（标量）。实数的转置等于它自身：
-// $(bold(y)^T bold(X) bold(w))^T = bold(w)^T bold(X)^T bold(y)$
-// 因此中间两项相等，可以合并：
-// $L(bold(w)) = bold(y)^T bold(y) - 2 bold(w)^T bold(X)^T bold(y) + bold(w)^T bold(X)^T bold(X) bold(w)$
-// 逐项求导：
-// 利用矩阵求导公式：
-// $nabla_{bold(w)} (bold(w)^T bold(a)) = bold(a)$ （类比 $a x$' 的导数为 $a$）
-// $nabla_{bold(w)} (bold(w)^T bold(A) bold(w)) = 2 bold(A) bold(w)$ （类比 $a x^2$' 的导数为 $2a x$）
-// 得：
-// $(partial L(bold(w))) / (partial bold(w)) = 0 - 2 bold(X)^T bold(y) + 2 bold(X)^T bold(X) bold(w)$
-// 方法二：链式法则法 (Chain Rule)
-// 这是更快捷的方法，将 $(bold(y) - bold(X) bold(w))$ 看作一个整体，避免繁琐的展开。
-// 令中间变量 $bold(z) = bold(y) - bold(X) bold(w)$，则 $L(bold(w)) = bold(z)^T bold(z)$。
-// 根据复合函数求导法则（外层导数 $times$ 内层导数）：
-// $(partial L) / (partial bold(w)) = (partial bold(z)) / (partial bold(w))^T dot (partial L) / (partial bold(z))$
-// 外层导数 ($L$ 对 $bold(z)$)：
-// $L = bold(z)^T bold(z) = ||bold(z)||^2$，类比 $x^2$，导数为 $2bold(z)$。
-// $(partial L) / (partial bold(z)) = 2 bold(z) = 2(bold(y) - bold(X) bold(w))$
-// 内层导数 ($bold(z)$ 对 $bold(w)$)：
-// $bold(z) = bold(y) - bold(X) bold(w)$，类比 $-a x$，导数系数为 $-bold(X)$。
-// $(partial bold(z)) / (partial bold(w)) = -bold(X)$
-// 组合：
-// 注意维度匹配（内层系数转置后左乘外层）：
-// $ (partial L(bold(w))) / (partial bold(w)) &= (-bold(X))^T dot 2(bold(y) - bold(X) bold(w))
-// &= -2 bold(X)^T (bold(y) - bold(X) bold(w))
-// &= -2 bold(X)^T bold(y) + 2 bold(X)^T bold(X) bold(w) $
-// ]
-// #note[
-// 特别地，对于二元线性回归，有：
-// $
-// w_1&=frac(sum_(i=1)^n (x_i-macron(x))(y_i-macron(y)), sum_(i=1)^n (x_i-macron(x))^2)
-// w_0&=macron(y)-w_1 macron(x)
-// $
-// ]
-微分法 (Differential Method)：这是处理复杂表达式最高效的方法。首先计算标量函数的微分 $d f$，然后将其整理成与 $d X$ 内积的形式，即 $ d f = tr((∂f/∂X)ᵀ d X)$，从而直接读出导数。
-$$
+这是最稳健的方法，核心是将矩阵运算展开成多项式形式，类比标量求导。
+展开矩阵乘法：
+利用转置性质 $(bold(A) - bold(B))^T = bold(A)^T - bold(B)^T$，将式子展开：
+$ L(bold(w)) &= (bold(y)^T - bold(w)^T bold(X)^T) (bold(y) - bold(X) bold(w))\ 
+&= bold(y)^T bold(y) - underbrace(bold(y)^T bold(X) bold(w), "标量 A") - underbrace(bold(w)^T \ bold(X)^T bold(y), "标量 B") + bold(w)^T bold(X)^T bold(X) bold(w) $
+合并同类项：
+注意 $bold(y)^T bold(X) bold(w)$ 的结果是一个实数（标量）。实数的转置等于它自身：
+$ (bold(y)^T bold(X) bold(w))^T = bold(w)^T bold(X)^T bold(y) $
+因此中间两项相等，可以合并：
+$ L(bold(w)) = bold(y)^T bold(y) - 2 bold(w)^T bold(X)^T bold(y) + bold(w)^T bold(X)^T bold(X) bold(w) $
+逐项求导：
+利用矩阵求导公式：
+$nabla_{bold(w)} (bold(w)^T bold(a)) = bold(a)$ （类比 $a x$' 的导数为 $a$）
+$nabla_{bold(w)} (bold(w)^T bold(A) bold(w)) = 2 bold(A) bold(w)$ （类比 $a x^2$' 的导数为 $2a x$）
+得：
+$(partial L(bold(w))) / (partial bold(w)) = 0 - 2 bold(X)^T bold(y) + 2 bold(X)^T bold(X) bold(w)$
+方法二：链式法则法 (Chain Rule)
+这是更快捷的方法，将 $(bold(y) - bold(X) bold(w))$ 看作一个整体，避免繁琐的展开。
+令中间变量 $bold(z) = bold(y) - bold(X) bold(w)$，则 $L(bold(w)) = bold(z)^T bold(z)$。
+根据复合函数求导法则（外层导数 $times$ 内层导数）：
+$(partial L) / (partial bold(w)) = (partial bold(z)) / (partial bold(w))^T dot (partial L) / (partial bold(z))$
+外层导数 ($L$ 对 $bold(z)$)：
+$L = bold(z)^T bold(z) = ||bold(z)||^2$，类比 $x^2$，导数为 $2bold(z)$。
+$(partial L) / (partial bold(z)) = 2 bold(z) = 2(bold(y) - bold(X) bold(w))$
+内层导数 ($bold(z)$ 对 $bold(w)$)：
+$bold(z) = bold(y) - bold(X) bold(w)$，类比 $-a x$，导数系数为 $-bold(X)$。
+$(partial bold(z)) / (partial bold(w)) = -bold(X)$
+组合：
+注意维度匹配（内层系数转置后左乘外层）：
+$ (partial L(bold(w))) / (partial bold(w)) &= (-bold(X))^T dot 2(bold(y) - bold(X) bold(w))
+&= -2 bold(X)^T (bold(y) - bold(X) bold(w))
+&= -2 bold(X)^T bold(y) + 2 bold(X)^T bold(X) bold(w) $
+]
+#note[
+特别地，对于二元线性回归，有：
+$
+w_1&=frac(sum_(i=1)^n (x_i-macron(x))(y_i-macron(y)), sum_(i=1)^n (x_i-macron(x))^2)
+w_0&=macron(y)-w_1 macron(x)
+$
+]
+微分法是处理复杂表达式最高效的方法。首先计算标量函数的微分 $d f$，然后将其整理成与 $d X$ 内积的形式，即 $ d f = tr((∂f/∂X)^T d X)$，从而直接读出导数。
+
 
 === 岭回归与拉索回归
 
@@ -151,7 +151,7 @@ $
 #note[
   - *L2正则化（岭回归）*​​：惩罚项是权重的平方和。这是一个平滑的、凸的函数，其梯度在权重接近零时也会变小。因此，在优化过程中，权重会逐渐缩小，但除非正则化参数λ趋于无穷大，否则权重不会精确为零。这意味着所有特征都会被保留，只是权重值变小了。
   - *L1正则化（Lasso 回归）*​​：惩罚项是权重的绝对值之和。这是一个非平滑的函数，在零点处不可导（有“尖点”）。当使用梯度下降或专用算法（如坐标下降）优化时，这些尖点使得最优解更容易出现在坐标轴上，即某些权重恰好为零。这称为*稀疏性*。
-
+]
 #figure(
   table(
     columns: 2,
@@ -174,41 +174,13 @@ $
   [特征较少，且都很重要], [*L2 (Ridge)*], [保留所有特征信息，通常预测精度略高，计算更稳定。],
   [特征间存在多重共线性], [*L2 (Ridge)*], [L1 倾向于随机保留相关特征中的一个；L2 会平摊权重，更稳健。]
 )
-]
+
 
 
 
 === 相关量化指标
-- 平均绝对误差(Mean Absolute Error, MAE):
-$
-  "MAE"=1/n sum_(i=1)^n |hat(y_i)-y_i|
-$
-- 均方误差(Mean-Square Error, MSE):
-$
-  "MSE"=1/n sum_(i=1)^n (hat(y_i)-y_i)^2
-$
-- 均方根误差(Root MSE):
-$
-  "RMSE"=sqrt(1/n sum_(i=1)^n (hat(y_i)-y_i)^2)
-$
-- 残差平方和(Sum of Squares due to Error, SSE):
-$
-  "SSE"=sum_(i=1)^n (hat(y_i)-y_i)^2
-$
-- 回归平方和(Sum of Squares of Regression, SSR):
-$
-  "SSR"=sum_(i=1)^n (hat(y_i)-macron(y))^2
-$
-- 总离平方和(Total Sum of Squares, SST):
-$
-  "SST"=sum_(i=1)^n (y_i-macron(y))^2
-$
-- $R$-平方系数(决定系数)($R$-Square):
-$
-  R^2="SSR"/"SST"=1-"SSE"/"SST"
-$
 
-#theorem[
+#note[
   当$L(w)$不考虑正则化损失时，有：
   $
     "SST"="SSR"+"SSE"
@@ -217,31 +189,7 @@ $
   $
     "SST"<"SSR"+"SSE"
   $
-]
-#proof[
-$
-  "SST"&=sum_(i=1)^n (y_i-macron(y))^2=sum_(i=1)^n (y_i-hat(y_i)+hat(y_i)-macron(y))^2\
-  &=sum_(i=1)^n (hat(y_i)-y_i)^2+sum_(i=1)^n (hat(y_i)-macron(y))^2+2sum_(i=1)^n (y_i-hat(y_i))(hat(y_i)-macron(y))\
-  &="SSE"+"SSR"+2sum_(i=1)^n (y_i-hat(y_i))(hat(y_i)-macron(y))
-$
-下证$sum_(i=1)^n (y_i-hat(y_i))(hat(y_i)-macron(y))=0$.
-
-注意到:
-$
-  (partial L(w))/(partial w_0)=0 arrow.double.r sum_(i=1)^m (hat(y_i)-y_i)=0\
-  
-$
-$  
-  &(partial L(w))/(partial w)=0 arrow.double.r sum_(i=1)^m x_i^T w (hat(y_i)-y_i)=0
-$
-所以有:
-$
-  sum_(i=1)^n (y_i-hat(y_i))(hat(y_i)-macron(y))
-  &=sum_(i=1)^n (y_i - hat(y_i))hat(y_i)-macron(y)sum_(i=1)^m x_i^T w (hat(y_i)-y_i)\
-  &=sum_(i=1)^n (y_i-hat(y_i))hat(y_i)\
-  &=sum_(i=1)^n (y_i-hat(y_i))(x_i^T w+w_0)\
-  &=sum_(i=1)^n (y_i-hat(y_i))x_i^T w+w_0 sum_(i=1)^n (y_i-hat(y_i))=0
-$
+  前文有.就不给证明了
 ]
 
 #note[
@@ -306,7 +254,7 @@ $
 
 同时也存在多项式回归的情况，多项式回归方程：
 $
-  hat(y_i)=g(x_i)=w_0+w_11 x_"i1"+w_12 x_"i2"+dots+w_"id" x_"id"+w_21 x^2_"i1"+dots+w_n x_"i1"x_"i2"+dots
+  hat(y_i)=g(x_i)=w_0+w_11 x_"i1"+w_12 x_"i2"+dots+\ w_"id" x_"id"+w_21 x^2_"i1"+dots+w_n x_"i1"x_"i2"+dots
 $
 #remark[
   包含偏置参数，一次项，高次项，交叉项等。这里要额外注意过拟合现象。*将多项式回归中的高次项和交叉项视为新的特征变量，从而将非线性问题转化为线性问题。*
