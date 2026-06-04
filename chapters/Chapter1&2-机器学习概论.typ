@@ -1,5 +1,7 @@
 #import "@local/ysz_tools:0.1.0":*
 #import "@preview/cuti:0.4.0":show-cn-fakebold
+#import "@preview/cetz:0.5.2":*
+
 #counter(page).update(1)
 #let plot(width:100%)= {
    cetz.canvas({
@@ -129,7 +131,7 @@ $ T={(x_1,y_1),(x_2,y_2),dots,(x_N,y_N)} $
 ]
 
 
-强化学习的马尔卡夫决策过程是状态、奖励、动作序列上的_随机过程_，由四元组$angle.l S,A,P,r angle.r$组成.
+强化学习的马尔卡夫决策过程是状态、奖励、动作序列上的_随机过程_，由四元组$< S,A,P,r >$组成.
 - $S$是有限状态的集合
 - $A$是有限动作的集合
 - $P$是状态转移概率函数（谁家图灵机？）

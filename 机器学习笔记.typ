@@ -1,5 +1,5 @@
 #import "@local/ysz_tools:0.1.0": *
-
+#set text(size: 9pt)
 #show: conf.with(
   sidebar:false,
 )
