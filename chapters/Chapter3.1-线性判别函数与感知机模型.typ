@@ -64,7 +64,55 @@ $
    $
    
 ]
+==== 线性判别函数求解
+考虑梯度求解.考察一个准则函数$J(W,X)$,在J的方向上更新梯度.则
+$
+W^(k+1) = W^k + c(- nabla J) = W^k - c [(partial J(W,X))/(partial W)]_(W = W^k)
+$#note[
+  PPT里没考虑batchnorm,或者,batch=1
+]
+下面考虑一个例子.
+==== 固定增量法
+$J(W,X) = 1/2 (abs(W^T X) - W^T X)$.
+  
+  $ frac(diff(W^T X), diff(W)) &= frac(diff, diff(W)) ( sum_(i=1)^n w_i x_i + w_(n+1) ) \
+  &= [ dots, frac(diff, diff(w_k)) ( sum_(i=1)^n w_i x_i + w_(n+1) ), dots]^T \
+  &= [x_1, dots, x_k, dots, x_n, 1]^T = X $
 
+  
+  #note[
+  $ frac(d X, d X^T) = frac(d X^T, d X) = I_(n times n) $
+  
+  $  therefore frac(partial(W^T X), partial(W)) = I X_((n+1) times 1) = X_((n+1) times 1) $]
+
+  当 $W^T X <= 0$ 时，$frac(diff(|W^T X|), diff(W)) = frac(diff(-W^T X), diff(W)) = -X$
+  
+ 
+    $  ==>frac(diff(|W^T X|), diff(W)) = ["sgn"(W^T X)] dot X $
+  
+  #note[
+  其中 $ "sgn"(W^T X) = cases(
+    +1 & "若 " W^T X > 0,
+    -1 & "若 " W^T X <= 0
+  ) $]
+  
+  #text(fill: rgb("ff0000"))[
+    $ therefore nabla J = frac(diff J(W, X), diff(W)) = 1/2 [X "sgn"(W^T X) - X] $
+  ]
+  $ W(k+1) &= W(k) - c 1/2 [X "sgn"(W^T(k) X) - X] \
+  //&= W(k) + c/2 [X - X "sgn"(W^T(k) X)] \
+  &= W(k) + #text(fill: rgb("ff0000"))[ $cases(
+    0 & "若 " W^T(k) X > 0,
+    c X & "若 " W^T(k) X <= 0
+  )$ ] $
+  这就是固定增量算法.#note[
+    可以看出，神经网络中的感知器算法是梯度方法的特例。梯度法是将感知器算法中联立不等 式求解W 的问题，转换为求目标函数极小值的问题。 
+    
+    分类算法是通过模式样本来确定判别函数的系数，因此必须采用有代表性的数据，这样训练 出来的判别函数，能合理反映模式数据的区隔情况。 
+  ]
+
+=== 回归与分类
+利用sign函数、sigmoid函数.对数纪律回归看下一章.
 === 线性判别分析 (LDA)
 
 线性判别分析（Linear Discriminant Analysis, LDA）主要用于*降维和分类*,关注“*投影后不同类别的数据分得最开*”。思想:
