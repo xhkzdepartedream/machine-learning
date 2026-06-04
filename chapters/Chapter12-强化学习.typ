@@ -1,9 +1,6 @@
 #import "@local/ysz_tools:0.1.0": *
 
-#show: conf.with(
-  title: "shabi",
-)
-
+= 强化学习
 == 强化学习基本设置 (Basic Settings of RL Problems)
 
 === 强化学习的直观理解与应用场景

@@ -1,7 +1,4 @@
 #import "@local/ysz_tools:0.1.0": *
-#show: conf.with(
-  header-chapter: "Chapter 4",
-)
 == 线性回归
 === 基本概念
 #definition[线性回归][

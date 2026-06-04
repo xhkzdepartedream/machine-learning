@@ -1,6 +1,6 @@
 #import "@local/ysz_tools:0.1.0": *
-#show: conf
 #let remark = note
+= 线性回归
 == 线性判别函数与感知机模型
 === 基本概念
 

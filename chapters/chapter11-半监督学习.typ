@@ -1,9 +1,5 @@
 #import "@local/ysz_tools:0.1.0": *
-
-#show: conf.with(
-  title: "shabi_ML",
-)
-
+= 半监督学习
 == 未标记样本与半监督学习
 
 === 背景与现实需求

@@ -1,8 +1,7 @@
 #import "@local/ysz_tools:0.1.0": *
 
-#show: conf.with(title: "shabi")
 #set math.equation(numbering: "(1)")
-
+= 降维与度量学习
 == 低维嵌入
 
 核心直觉：空间扩张速度远超数据填充速度。在高维情形下出现的数据样本稀疏、距离计算困难等问题，是机器学习方法共同面临的严重障碍，被称为维数灾难（维数爆炸）。

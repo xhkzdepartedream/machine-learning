@@ -1,6 +1,5 @@
 #import "@local/ysz_tools:0.1.0": *
-#show: conf
-
+= 贝叶斯分类器
 == 贝叶斯决策论 (Bayesian Decision Theory)
 
 若将样本 $x$ 判定为类别 $c_i$，其期望损失为：

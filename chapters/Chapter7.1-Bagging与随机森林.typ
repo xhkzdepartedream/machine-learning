@@ -1,5 +1,4 @@
 #import "@local/ysz_tools:0.1.0": *
-#show: conf
 
 
 == Bagging 与 随机森林

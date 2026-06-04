@@ -1,8 +1,5 @@
 #import "@local/ysz_tools:0.1.0": *
-
-#show: conf.with(
-  title: "shabi_ML",
-)
+= 特征选择
 == 子集搜索与评价
 
 === 特征的基本概念
