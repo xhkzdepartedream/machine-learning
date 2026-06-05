@@ -223,7 +223,7 @@ $
 ]
 
 #figure(
-  align(image("/assets/image-6.png"),center),
+  align(image("/assets/image-6.png",width: 50%),center),
   caption:[
     红色的东西就是支持向量.线(无论是虚线还是实线)都是超平面.
   ]

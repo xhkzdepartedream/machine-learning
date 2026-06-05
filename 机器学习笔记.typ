@@ -10,8 +10,8 @@
 
 #include "前言.typ"
 #pagebreak()
-#outline(depth: 2)
-
+#outline(depth: 3)
+#pagebreak()
 #include "chapters/Chapter1&2-机器学习概论.typ"
 
 #include "chapters/Chapter3.1-线性判别函数与感知机模型.typ"
@@ -27,10 +27,6 @@
 #include "chapters/Chapter6-决策树.typ"
 
 #include "chapters/Chapter7-集成学习.typ"
-
-#include "chapters/Chapter7.1-Bagging与随机森林.typ"
-
-#include "chapters/Chapter7.2-Boosting.typ"
 
 #include "chapters/Chapter8-降维与度量学习.typ"
 
