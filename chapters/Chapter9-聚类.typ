@@ -2,8 +2,7 @@
 
 
 == 聚类方法
-形式化地：
-#note[聚类（Clustering）是按照某个特定标准（如距离）把一个数据集分割成不同的类或簇，使得同一个簇内的数据对象的相似性尽可能大，同时不在同一个簇中的数据对象的差异性也尽可能地大。聚类后同一类的数据尽可能聚集到一起，不同类数据尽量分离。
+形式化地：#note[聚类（Clustering）是按照某个特定标准（如距离）把一个数据集分割成不同的类或簇，使得同一个簇内的数据对象的相似性尽可能大，同时不在同一个簇中的数据对象的差异性也尽可能地大。聚类后同一类的数据尽可能聚集到一起，不同类数据尽量分离。
 
 #unim[
   *硬聚类（hardclustering）*方法：一个聚类方法假定一个样本只能属于一个类或类的交集为空集。
@@ -157,8 +156,7 @@ $ "avg"(C) = (2)/(|C|(|C|-1)) sum_(x_i, x_j in C) "dist"(x_i, x_j)` $
 #mitex(`diam(C) = \max_{x_i, x_j \in C} dist(x_i, x_j)`)
 
   3. *簇间最近样本距离 #mi(`d_{min}(C_i, C_j)`)*
-#mitex(`d_{min}(C_i, C_j) = \min_{x_i \in C_i, x_j \in C_j} dist(x_i, x_j)`)
-#note[
+#mitex(`d_{min}(C_i, C_j) = \min_{x_i \in C_i, x_j \in C_j} dist(x_i, x_j)`)#note[
 1. 把同一个簇里的人两两之间量一下距离，算个平均数。这个值越小越好，说明簇内足够紧凑。
 2. 同一个簇里，相距最远的两个人有多远。这就好比一个团队的“直径”。这个值同样越小越好，说明圈子没有拉得太长。
 3. A 簇边缘的人和 B 簇边缘的人，最容易发生混淆的两个点的距离。这个值越大越好，说明两个圈子界限分明，井水不犯河水。
@@ -266,7 +264,6 @@ S = \frac{1}{m} \sum_{i=1}^m (\mathbf{x}_i - \mathbf{M})(\mathbf{x}_i - \mathbf{
 $
 "MinkovDM"_p (x_i,x_j) = (sum_(u=1)^n_c abs(x_(i u) - x_(j u))^p + sum_(u=n_c+1)^n "VDM"_p (x_(i u),x_(j u)))^(1/p)
 $
-
 #note[
 在现实世界里，一个样本往往既有数字（身高、年龄），又有文字（性别、职业）。
 前半部分 #mi(`\sum |x_{iu} - x_{ju}|^p`)：这是传统的闵可夫斯基距离，用来算数字属性（有序属性）。
@@ -323,8 +320,7 @@ $
 
 $k$均值聚类算法的复杂度是$O(m n k)$, 其中$m$是样本维数，$n$是样本个数，$k$是类别个数。
 
-==== $k$均值聚类的算法特点与局限性
-#note[
+==== $k$均值聚类的算法特点与局限性#note[
 
   类中心在聚类的过程中会发生移动，但是往往不会移动太大
 
@@ -345,7 +341,6 @@ $k$均值聚类有以下特点：基于划分的聚类方法：类别数$k$事�
   - “平坦”意味着所有生成的簇（Clusters）处于同一层级，地位平等。
   - “非层次化”意味着簇之间不存在“嵌套”或“包含”关系（即没有父类和子类的概念）。
 ]
-
 
 
 
@@ -398,8 +393,7 @@ $k$均值聚类有以下特点：基于划分的聚类方法：类别数$k$事�
 
     - *else* #h(4.1em) \# 类别不同，令 $p^*$ 远离 $x_j$
 
-        $p' = p^* - eta dot (x_j - p^*)$
-#note[
+        $p' = p^* - eta dot (x_j - p^*)$#note[
 更新规则的几何解释
 
 两种更新方式的本质是调整 #mi(`\boldsymbol{p}^*`)的位置。
@@ -423,7 +417,6 @@ $k$均值聚类有以下特点：基于划分的聚类方法：类别数$k$事�
 #mitex(`\|\boldsymbol{p}' - \boldsymbol{x}_j\| = (1 + \eta)\,\|\boldsymbol{p}^* - \boldsymbol{x}_j\|`)
 
 即距离扩大为原来的 #mi(`(1+\eta)`) 倍，#mi(`\boldsymbol{p}^*`) 远离 #mi(`\boldsymbol{x}_j`)。
-
 #note[
   *学习率 #mi(`\eta`) 的作用*：#mi(`\eta`) 越大，原型向量对单个样本的响应越激烈；#mi(`\eta`) 越小，收敛越平稳但速度较慢。实践中通常随迭代轮次衰减。
 ]
@@ -480,7 +473,6 @@ LVQ 以一个点代表一个簇，表达能力有限。高斯混合模型（Gaus
 实际上 #mi(`z_j`) 未知，利用贝叶斯定理求 #mi(`z_j`) 的*后验概率*（已观测到的 #mi(`\boldsymbol{x}_j`) 来自第 #mi(`i`) 个分量的概率）：
 
 #mitex(`\gamma_{ji} = p_{\mathcal{M}}(z_j = i \mid \boldsymbol{x}_j) = \frac{P(z_j=i) \cdot p(\boldsymbol{x}_j \mid z_j=i)}{p_{\mathcal{M}}(\boldsymbol{x}_j)} = \frac{\alpha_i \cdot p(\boldsymbol{x}_j \mid \boldsymbol{\mu}_i, \boldsymbol{\Sigma}_i)}{\displaystyle\sum_{l=1}^k \alpha_l \cdot p(\boldsymbol{x}_j \mid \boldsymbol{\mu}_l, \boldsymbol{\Sigma}_l)}`)
-
 #note[
   #mi(`\gamma_{ji}`) 是软聚类的核心量：它不是 0/1 的硬分配，而是样本 #mi(`\boldsymbol{x}_j`) 对各成分连续的隶属概率，满足 #mi(`\sum_{i=1}^k \gamma_{ji} = 1`)。
 ]
@@ -607,7 +599,6 @@ LVQ 以一个点代表一个簇，表达能力有限。高斯混合模型（Gaus
 #definition[密度相连][
   对 #mi(`\boldsymbol{x}_i`) 与 #mi(`\boldsymbol{x}_j`)，若存在 #mi(`\boldsymbol{x}_k`) 使得 #mi(`\boldsymbol{x}_i`) 与 #mi(`\boldsymbol{x}_j`) 均由 #mi(`\boldsymbol{x}_k`) 密度可达，则称 #mi(`\boldsymbol{x}_i`) 与 #mi(`\boldsymbol{x}_j`) *密度相连*。
 ]
-
 #note[
 *形象理解*：
 
@@ -724,7 +715,6 @@ DBSCAN 算法初始任意选择一个核心对象，然后*找到所有这个核
 //   [#mi(`\epsilon = 0.1`), #mi(`MinPts = 15`)], [7], [过碎], [#mi(`MinPts`) 太大，核心对象减少],
 //   [#mi(`\epsilon = 0.1`), #mi(`MinPts = 20`)], [17], [过碎], [核心对象进一步减少，簇被割裂],
 // )
-
 #note[
   *参数选择经验*：
   
@@ -927,7 +917,6 @@ D_{HJ} &= \max \{ D(\boldsymbol{X}_H, \boldsymbol{X}_J) \} \quad \boldsymbol{X}_
 #unim[
 *特点*：均连接法是*从全局出发顾全大局的一种度量*——考虑了两个簇中所有样本对的平均距离，兼顾了单链接和全链接的特点。
 ]
-
 #note[
   实际问题中常用几种不同的方法，比较分类结果，从而选择一个比较切合实际的分类。
   

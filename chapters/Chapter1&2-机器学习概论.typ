@@ -90,7 +90,6 @@ $ T={(x_1,y_1),(x_2,y_2),dots,(x_N,y_N)} $
 
 
 
-
 #note[
 
 特征空间与输入空间是不一定一样的，有时需要将实例从输入空间映射到特征空间.
@@ -391,8 +390,7 @@ $ PP [exists h in H :|E_"in" (h) - E_"out" (h)| > epsilon] <= 2 M e^(-2 epsilon^
 
 $ PP [exists h in H : |E_"in"(h) - E_"out"(h)| > epsilon] <= 2 Pi_H (2m) e^(-2 epsilon^2 m \/ 8) $
 
-再由 *Sauer 引理*，当 $Pi_H (m) <= O(m^(d_"vc"))$，多项式增长远远慢于指数衰减，于是右侧仍然趋于 0.
-#note[
+再由 *Sauer 引理*，当 $Pi_H (m) <= O(m^(d_"vc"))$，多项式增长远远慢于指数衰减，于是右侧仍然趋于 0.#note[
 
 假设空间$cal(H),"VC"(cal(H)) = d,forall m in NN$,
 $
@@ -416,8 +414,7 @@ $
       &= sum_(i=0)^d binom(m-1, i) + sum_(i=0)^(d-1) binom(m-1, i) \
       &= binom(m-1, 0) + sum_(i=1)^d [binom(m-1, i) + binom(m-1, i-1)] \
       &= binom(m, 0) + sum_(i=1)^d binom(m, i) = Phi(m, d) $
-]]
-#note[
+]]#note[
    为什么我们要花这么多精力探讨VC维度?如下是gemini的一个答案.
 
 
@@ -690,8 +687,7 @@ P-R曲线 ：精度（Precision）与召回率（Recall）的曲线.
 ROC（Receiver Operating Characteristic）曲线：接受者操作特性曲线.与P-R曲线类似， 逐次设置阈值把样本预测为“正例”和“反例”，计算当前的真正例率和假正例率.ROC 曲线其与坐标轴围成的面积AUC越大性能越优.
 #figure(image("/assets/image-3.png"),caption:[
    同上,我们对测试集的N个样本描绘N个点.每当你把阈值跨过某一个样本的得分时，TP（真阳性）或 FP（假阳性）的数量就会发生变化，从而在图上产生一个新的点.
-])
-#note[
+])#note[
    直观理解ROC曲线，就是模型区分能力：区分能力越强，越能把正例设置为接近 1，反例设置为接近 0，那如何取阈值都不重要了.
 ]
 
@@ -715,7 +711,6 @@ $ "MSE" = (1)/(n) sum_(i=1)^n (hat(y)_i - y_i)^2 $
 $ "RMSE" = sqrt("MSE") $
 
 *特点*：量纲与原始数据一致，更直观。
-
 #note[
 
 为什么回归任务中两者形式一致，而分类任务不同？
@@ -752,7 +747,6 @@ $ R^2 = ("SSR")/("SST") = 1 - ("SSE")/("SST") $
 *取值范围*：$[0, 1]$
 
 *物理意义*：$R^2$ 越接近 1，表示模型解释数据变动的能力越强，拟合效果越好.
-
 
 #note[
 + 为什么 L2 损失常加系数 $1/2$？

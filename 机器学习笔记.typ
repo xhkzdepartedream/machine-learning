@@ -6,11 +6,27 @@
   author: "bjhh2025, xhkzdepartedream, kiwiizzz, zoomy",
   date: "2026.6"
 )
+#show heading: set block(below: 0em) // 默认值通常较大，可以改成 0.8em 或更小
+#set footnote.entry(
+  // 上方横线：默认只有 30% 宽，我们把它改成 100% 满宽，并设置粗细
+  separator: line(length: 100%, stroke: 0.5pt),
+  // clearance: 1.5em, // 脚注与正文之间的间距
+  // gap: 0.8em,       // 多个脚注之间的间距
+)
+#note[
+  1
+]
 
-#include "license.typ"
+// 2. 利用 show 规则在整个脚注区域的“下方”再加一条横线
+#show footnote.entry: it => {
+  it // 渲染脚注内容本身
+  line(length: 100%, stroke: 0.5pt) // 下方横线
+}
+// #include "license.typ"
 
-#include "前言.typ"
-#pagebreak()
+// #include "前言.typ"
+// #pagebreak()
+
 #outline(depth: 3)
 #pagebreak()
 #include "chapters/Chapter1&2-机器学习概论.typ"

@@ -61,7 +61,6 @@ $
 $
   norm(epsilon_t-epsilon_theta (macron(alpha)_t x_0+alpha_t macron(beta)_(t-1)macron(epsilon)_(t-1)+beta_t epsilon_t, t))^2
 $<diffusion_loss1>
-
 #note[
   注意这里不能用@eqt:diffusion_recursion 来给出$x_t$，这是因为我们事先采样了$epsilon_t$，就不能再独立地采样$macron(epsilon)_t$了，因为这二者是不独立的。
 ]
@@ -101,8 +100,7 @@ $<diffusion_loss1>
 接下来我们反过来将$epsilon_t$用$epsilon,w$重新表示出来
 $
   epsilon_t=frac((beta_t epsilon-alpha_t macron(beta)_(t-1)w)macron(beta)_t, beta_t^2+alpha^2_t macron(beta)_(t-1)^2)=frac(beta_t epsilon-alpha_t macron(beta)_(t-1)w, macron(beta)_(t))
-$
-#note[
+$#note[
   在实际训练中，我们是固定$x_0$和$t$，随机采样噪声$macron(epsilon)_(t-1)$和$epsilon_t$，构造出$x_(t-1)$和$x_t$，然后计算损失，不断重复采样，求平均损失。这里求平均损失的过程，在数学上我们用期望表示。
 ]
 
@@ -114,8 +112,7 @@ $
 注意到，现在损失函数关于关于$w$是二次的，所以可用展开后把期望算出来，结果是
 $
   beta_t^2/macron(beta)_t^2 EE_(epsilon tilde.op N(0,I)) [norm(epsilon-macron(beta)_t/beta_t epsilon_theta (macron(alpha)_t x_0+macron(beta)_t epsilon, t))^2]+"常数"
-$
-#note[
+$#note[
   这里面我们要训练的参数是$theta$(通常是Unet的参数)，而$alpha_t$和$beta_t$都是通过超参数或预定义函数处理的，不需要训练，因而他们在损失函数计算中被当作常数。
 
   在满足$alpha_t^2+beta_t^2=1$的前提下，常见的集中调度策略是：
@@ -227,8 +224,7 @@ $
 省略前面的系数，就是最终的损失函数了。另外我们也可以得到：
 $
   p(x_(t-1)|x_t) approx p(x_(t-1)|x_t, x_0=macron(mu)(x_t))=N(x_(t-1);1/alpha_t (x_t-beta_t^2 / macron(beta_t) epsilon_theta (x_t,t)), (macron(beta)^2_(t-1)beta_t^2)/macron(beta)^2_t I)
-$
-#note[
+$#note[
   特别注意，
   $
     (alpha_t macron(beta)_(t-1)^2)/beta_t^2 + (macron(alpha)_(t-1) beta_t^2)/(macron(alpha)_t macron(beta)_t^2) =1/alpha_t
