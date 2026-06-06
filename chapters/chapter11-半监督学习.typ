@@ -12,7 +12,8 @@
   让学习器不依赖外界交互，自动地利用未标记样本来提升学习性能的学习方法，即为半监督学习。
 ]
 
-=== 未标记样本的效用与直观理解#note[
+=== 未标记样本的效用与直观理解
+#note[
   #example(title: "未标记样本的撮合效用")[
     假设在二维空间中只有一个正样本 $+$ 和一个负样本 $-$。如果此时输入一个待预测样本 $bold(x)$ 正好位于两者的中点，仅基于监督学习只能随机猜测。
 
@@ -123,6 +124,7 @@ $
 $ f(bold(x)) = arg max_(j in cal(Y)) p(Theta = j | bold(x)) $
 其中，样本由第 $i$ 个高斯混合成分生成的后验概率为：
 $ p(Theta = i | bold(x)) = (alpha_i dot p(bold(x) | mu_i, Sigma_i)) / (sum_(k=1)^N alpha_k dot p(bold(x) | mu_k, Sigma_k)) $
+
 #note[
   在式 (13.2) 中：
   - 估计类别与混合成分的对应概率 $p(y = j | Theta = i, bold(x))$ 时*必须知道标记*，故仅能使用有标记数据。
@@ -133,7 +135,8 @@ $ p(Theta = i | bold(x)) = (alpha_i dot p(bold(x) | mu_i, Sigma_i)) / (sum_(k=1)
 给定有标记样本集 $D_l = {(bold(x)_1, y_1), dots, (bold(x)_l, y_l)}$ 和未标记样本集 $D_u = {bold(x)_(l+1), dots, bold(x)_(l+u)}$，$l << u$。假设样本独立同分布，则高斯混合模型参数的联合对数似然为：
 $
   LL(D_l union D_u) = sum_((bold(x)_j, y_j) in D_l) ln ( sum_(i=1)^N alpha_i dot p(bold(x)_j | mu_i, Sigma_i) dot p(y_j | Theta = i, bold(x)_j) )\ + sum_(bold(x)_j in D_u) ln ( sum_(i=1)^N alpha_i dot p(bold(x)_j | mu_i, Sigma_i) )
-$#note[
+$
+#note[
 上式第一项为基于有标记数据的*有监督项*：模型不仅要解释为什么这里有个点，还要解释为什么这个点是个猫。要算的是联合概率 #mi(`p(\mathbf{x}_j, y_j)`)。
 - #mi(`\alpha_i \cdot p(\mathbf{x}_j \mid \mathbf{mu}_i, \mathbf{\Sigma}_i)`)：这和前面一样，是第 #mi(`i`) 个高斯成分产生出这个点 #mi(`\mathbf{x}_j`) 的概率。
 - #mi(`p(y_j \mid \Theta = i, \mathbf{x}_j)`)：这是一个修正因子。“如果这个点确实是由第 #mi(`i`) 个高斯成分产生的，那么这个成分恰好是 #mi(`y_j`)（猫）的概率是多少？”
@@ -154,7 +157,8 @@ $#note[
    $ gamma_(j i) = (alpha_i dot p(bold(x)_j | mu_i, Sigma_i)) / (sum_(k=1)^N alpha_k dot p(bold(x)_j | mu_k, Sigma_k)) $
 
 2. *M 步 (Maximization)*：更新模型参数。令 $l_i$ 表示第 $i$ 类的有标记样本数目（即 $l_i = sum_((bold(x)_j, y_j) in D_l) bb(I)(y_j = i)$），更新公式为：
-   $ mu_i = 1 / (sum_(bold(x)_j in D_u) gamma_(j i) + l_i) ( sum_(bold(x)_j in D_u) gamma_(j i) bold(x)_j + sum_( (bold(x)_j, y_j) in D_l and y_j = i ) bold(x)_j ) $#note[
+   $ mu_i = 1 / (sum_(bold(x)_j in D_u) gamma_(j i) + l_i) ( sum_(bold(x)_j in D_u) gamma_(j i) bold(x)_j + sum_( (bold(x)_j, y_j) in D_l and y_j = i ) bold(x)_j ) $
+#note[
     本质上是一个加权平均：
     1. 右边项（硬证据）： #mi(`\sum \mathbf{x}_j`)。这是正牌的有标记数据（#mi(`D_l`)）。如果标签写着它是猫（#mi(`y_j = i`)），那它的权重就是整整的 #mi(`1`)。
     2. 左边项（软证据）： #mi(`\sum \gamma_{ji} \mathbf{x}_j`)。这是未标记数据（#mi(`D_u`)）。若只有 #mi(`0.8`) 的概率是猫，那就只贡献 #mi(`0.8`) 个点的力量。
@@ -239,7 +243,8 @@ TSVM 通过局部搜索迭代寻找近似解。
   3. 初始化参数 $C_u << C_l$；
   4. *while* $C_u < C_l$ *do*
   5. #h(1.5em) 基于 $D_l, D_u, hat(bold(y)), C_l, C_u$ 求解式 (13.9)，得到 $(bold(w), b), bold(xi)$；
-  6. #h(1.5em) *while* $exists i, j$ 满足 $(hat(y)_i hat(y)_j < 0) and (xi_i > 0) and (xi_j > 0) and (xi_i + xi_j > 2)$ *do* #note[
+  6. #h(1.5em) *while* $exists i, j$ 满足 $(hat(y)_i hat(y)_j < 0) and (xi_i > 0) and (xi_j > 0) and (xi_i + xi_j > 2)$ *do* 
+#note[
        如果在某轮求解中，存在一对未标记样本 #mi(`bold(x)_i`) 和 #mi(`bold(x)_j`)：
     1. 它们被指派了不同的伪标记 (#mi(`hat(y)_i hat(y)_j < 0`))；
     2. 且它们的松弛变量满足 #mi(`xi_i > 0`) 和 #mi(`xi_j > 0`)；
@@ -277,7 +282,8 @@ $
 其中 $sigma > 0$ 是用户指定的高斯函数带宽参数。度矩阵 $bold(D) = "diag"(d_1, dots, d_(l+u))$ 是一个对角矩阵，其对角线元素为 $d_i = sum_(j=1)^(l+u) W_(i j)$。
 
 === 二分类标记传播闭式解
-假定我们希望学得一个实值函数 $f : V -> RR$，对应的分类规则为 $y_i = "sign"(f(bold(x)_i))$。直观上，相似的样本应具有相似的标记(为了满足流形假设（或平滑性约束）)，故可定义关于 $f$ 的能量函数：#note[
+假定我们希望学得一个实值函数 $f : V -> RR$，对应的分类规则为 $y_i = "sign"(f(bold(x)_i))$。直观上，相似的样本应具有相似的标记(为了满足流形假设（或平滑性约束）)，故可定义关于 $f$ 的能量函数：
+#note[
   可以把这个能量理解为“社会舆论压力”或“朋友圈的不和谐度”。
   
   如果我和你是死党（#mi(`W_{ij}`) 很大），但是我的观点和你的观点差了十万八千里（#mi(`(f_i - f_j)^2`) 很大），那我们俩在一起就会天天吵架，整个网络的“不和谐能量”就会飙升。
@@ -309,7 +315,8 @@ $
   => bold(f)_u = (bold(D)_(u u) - bold(W)_(u u))^(-1) bold(W)_(u l) bold(f)_l //\tag{13.15}
 $
 令标记传播矩阵 $bold(P) = bold(D)^(-1) bold(W)$，其对应分块为 $bold(P)_(u u) = bold(D)_(u u)^(-1) bold(W)_(u u)$，$bold(P)_(u l) = bold(D)_(u u)^(-1) bold(W)_(u l)$。上式可进一步重写为：
-$ bold(f)_u = (bold(I) - bold(P)_(u u))^(-1) bold(P)_(u l) bold(f)_l $#note[
+$ bold(f)_u = (bold(I) - bold(P)_(u u))^(-1) bold(P)_(u l) bold(f)_l $
+#note[
   把人分成两拨：
   - 铁杆派（#mi(`\mathbf{f}_l`)）：这帮人有初始标签，立场坚定，打死也不改颜色。
   - 墙头草（#mi(`\mathbf{f}_u`)）：这帮人没标签，他们的颜色完全取决于周围的朋友。
@@ -324,7 +331,8 @@ $ bold(f)_u = (bold(I) - bold(P)_(u u))^(-1) bold(P)_(u l) bold(f)_l $#note[
 $ bold(Y)_(i j) = cases(1 &"if" (1 <= i <= l) and (y_i = j), 0 &"otherwise") $
 其前 $l$ 行为已知有标记样本的 One-hot 编码，剩余行为 $0$。基于度矩阵构建标记传播矩阵 $bold(S) = bold(D)^(-1/2) bold(W) bold(D)^(-1/2)$。算法采用如下迭代计算式：
 $ bold(F)(t+1) = alpha bold(S) bold(F)(t) + (1 - alpha) bold(Y) $
-其中，$alpha in (0, 1)$ 用于控制标记传播项与初始化项的折中比重。#note[
+其中，$alpha in (0, 1)$ 用于控制标记传播项与初始化项的折中比重。
+#note[
   - #mi(`\alpha`) 趋近于 1 时：模型极其信任网络中“朋友之间的小道消息传话”。颜色在图上会扩散得非常剧烈、非常远。但缺点是传着传着，最初那几个有标记样本的真实标签（正确答案）就会被稀释、甚至被洗脑洗掉。
 
   - #mi(`\alpha`) 趋近于 0 时：模型极其保守，只认死理。大家几乎不怎么传话，未标记样本很难从周围邻居那里学到有效的分布信息。]由于 $bold(S)$ 的特征值绝对值不大于 $1$，当 $t -> infinity$ 时，迭代必收敛。收敛解为：
@@ -348,6 +356,7 @@ $ bold(F)^\* = (1 - alpha)(bold(I) - alpha bold(S))^(-1) bold(Y) $
 基于分歧的方法使用多个学习器，而学习器之间的分歧（Disagreement）对未标记数据的利用至关重要。
 
 其代表是 协同训练 (Co-training) 算法。协同训练最初是针对多视图（Multi-view）数据设计的，是多视图学习（Multi-view learning）的里程碑。
+
 #note[
   #example(title: "电影数据的多视图性质")[
     在现实生活中，一个数据对象往往拥有多个属性集，每个属性集构成一个视图（View）：
@@ -367,7 +376,8 @@ $ bold(F)^\* = (1 - alpha)(bold(I) - alpha bold(S))^(-1) bold(Y) $
   *输入*：有视图标记样本集 $D_l$；未标记样本集 $D_u$；缓冲池大小 $s$；每轮挑选正、反例数 $p, n$；基学习算法 $cal(L)$；训练轮数 $T$。 \
   *输出*：视图分类器 $h_1, h_2$。 \
   *过程*：
-  1. 从 $D_u$ 中随机抽取 $s$ 个样本构成*缓冲池* $D_s$，$D_u = D_u ∖ D_s$；#note[
+  1. 从 $D_u$ 中随机抽取 $s$ 个样本构成*缓冲池* $D_s$，$D_u = D_u ∖ D_s$；
+#note[
    为什么不直接从海量的未标记集 #mi(`D_u`) 里挑样本，非要搞一个大小为 #mi(`s`) 的“缓冲池 #mi(`D_s`)”？
    
    *为了防止标签漂移（Label Drift）和类别不平衡。*如果直接从几百万数据的 #mi(`D_u`) 里挑，分类器可能每轮挑出来的全都是长得极其相似的、极端的“超级大正例”。这样不仅无法给另一个分类器带来新知识，还会让数据集瞬间失去平衡。
@@ -393,12 +403,14 @@ $ bold(F)^\* = (1 - alpha)(bold(I) - alpha bold(S))^(-1) bold(Y) $
 
 理论证明，如果两个视图满足：
 - 充分性（即每个视图单独就足以让分类器收敛）：任何一个单独的视图，都包含了足够完整的信息，多给点数据它自己就能把题解出来。
-- 条件独立性（给定类别标记时，两个视图的属性条件独立）#note[
+- 条件独立性（给定类别标记时，两个视图的属性条件独立）
+#note[
   充分性保证了两个分类器能“互相提供有用的新知识”；条件独立性保证了它们“不会互相传染对方的偏见和错误”。
 ]
 则利用未标记样本通过协同训练可以将弱分类器的泛化性能提升到任意高。
 
-虽然在现实任务中"条件独立性"几乎无法完美满足#note[
+虽然在现实任务中"条件独立性"几乎无法完美满足
+#note[
   条件独立性要求“给定类别时，两个视图完全不相关”。但这在现实中是不可能的。
   
   比如一部动作片（给定类别），它的画面往往有“追逐爆炸”（视图 1），而它的音效也必然会有“轰鸣和枪声”（视图 2）。画面和音效在暗中是有强烈的因果和物理关联的，绝对做不到数学上的完全独立。所以现实中协同训练只能尽力逼近，无法达到理论上的任意高精度。
@@ -450,10 +462,12 @@ $ bold(F)^\* = (1 - alpha)(bold(I) - alpha bold(S))^(-1) bold(Y) $
     - *勿连回避*：若存在约束 $(bold(x)_i, bold(x)_b) in cal(C)$，且已指派样本 $bold(x)_b in C_B$，则必须满足 $j != B$。
     随后将该样本并入对应簇中：$C_r = C_r union {bold(x)_i}$。
    - 在全体样本指派完成后，基于各簇吸纳的新成员，重新计算并动态更新其均值中心：
-     $ bold(mu)_j = 1 / (|C_j|) sum_(bold(x) in C_j) bold(x) , quad (j = 1, 2, dots, k) $#note[
+     $ bold(mu)_j = 1 / (|C_j|) sum_(bold(x) in C_j) bold(x) , quad (j = 1, 2, dots, k) $
+#note[
   *规则死锁与中止*：若某个样本身上背负的必连与勿连约束过于繁重或自相矛盾，导致遍历所有簇均告违规（即有效候选集完全归空 $cal(K)_("valid") = emptyset$），意味着在当前中心布局下无解，算法将立即中断并抛出异常退出。
 ]
 ]
+
 #note[
   以西瓜数据集 4.0 (30 个样本) 为例，在限定必连集 $cal(M)$ 和勿连集 $cal(C)$ 条件下，设置 $k = 3$，经历 5 轮迭代收敛，给出三个簇的最终划分结果。
 ]

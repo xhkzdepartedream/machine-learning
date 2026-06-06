@@ -13,9 +13,7 @@
   // clearance: 1.5em, // 脚注与正文之间的间距
   // gap: 0.8em,       // 多个脚注之间的间距
 )
-#note[
-  1
-]
+
 
 // 2. 利用 show 规则在整个脚注区域的“下方”再加一条横线
 #show footnote.entry: it => {
