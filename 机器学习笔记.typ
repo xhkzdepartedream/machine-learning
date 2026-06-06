@@ -2,9 +2,10 @@
 #set text(size: 9pt)
 #show: conf.with(
   sidebar:false,
+  title: "机器学习方法",
+  author: "bjhh2025, xhkzdepartedream, kiwiizzz, zoomy",
+  date: "2026.6"
 )
-
-#include "封面.typ"
 
 #include "license.typ"
 
