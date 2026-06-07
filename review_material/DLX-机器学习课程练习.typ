@@ -1,24 +1,13 @@
-#import "@local/ysz_tools:0.1.0":*
-#show:conf.with(
-  sidebar:false,
-  title:"机器学习课程练习",
-  author:"kiwiizzz"
-)
-#let answer = block
+#set text(font :("Times New Roman","STSong"))
 #import "@preview/cuti:0.4.0":show-cn-fakebold
 #show: show-cn-fakebold
-#show:text.with(font:("New Computer Modern","STSong"), size: 12pt)
-#let horizontalrule = line(start: (25%,0%), end: (75%,0%))
-
-#show terms.item: it => block(breakable: false)[
-  #text(weight: "bold")[#it.term]
-  #block(inset: (left: 1.5em, top: -0.4em))[#it.description]
-]
-
+#show math.equation.where(block: false): it => math.display(it)
+#show math.equation: set text(font: ("New Computer Modern Math",) , purple)
 #set table(
   inset: 6pt,
   stroke: none
 )
+
 #show figure.where(
   kind: table
 ): set figure.caption(position: top)
@@ -26,194 +15,124 @@
 #show figure.where(
   kind: image
 ): set figure.caption(position: bottom)
+#let show_answer = true
 
-#let content-to-string(content) = {
-  if content.has("text") {
-    content.text
-  } else if content.has("children") {
-    content.children.map(content-to-string).join("")
-  } else if content.has("body") {
-    content-to-string(content.body)
-  } else if content = [ ] {
-    " "
+#let answer(body) = {
+  if show_answer {
+    block(
+      fill: gray.lighten(80%),   
+      inset: 8pt,                
+      radius: 4pt,               
+      width: 100%,               
+      stroke: 0.5pt + gray,      
+    )[
+        #set text(fill: blue,weight: "bold") // 这一行会让方框内所有的文字和公式都变成蓝色
+  #show math.equation: set text(font: ("New Computer Modern Math",) , blue)
+      #body
+    ]
+  } else {
+    // 当开关为 false 时，什么都不渲染（返回空）
+    none
   }
 }
-#let conf(
-  title: none,
-  subtitle: none,
-  authors: (),
-  keywords: (),
-  date: none,
-  abstract-title: none,
-  abstract: none,
-  thanks: none,
-  cols: 1,
-  margin: (x: 1.25in, y: 1.25in),
-  paper: "us-letter",
-  lang: "en",
-  region: "US",
-  font: none,
-  fontsize: 11pt,
-  mathfont: none,
-  codefont: none,
-  linestretch: 1,
-  sectionnumbering: none,
-  linkcolor: none,
-  citecolor: none,
-  filecolor: none,
-  pagenumbering: "1",
-  doc,
-) = {
-  set document(
-    title: title,
-    keywords: keywords,
+// #let answer(body) = block(
+//   fill: gray.lighten(80%),   
+//   inset: 8pt,                
+//   radius: 4pt,               
+//   width: 100%,               
+//   stroke: 0.5pt + gray,      
+// )[
+//   #set text(fill: blue,weight: "bold") // 这一行会让方框内所有的文字和公式都变成蓝色
+//   #show math.equation: set text(font: ("New Computer Modern Math",) , blue)
+//   #body
+// ]
+#import "@preview/minicise:0.1.0": sheet
+#show: sheet.with(
+  title: "机器学习练习",
+  course: "机器学习方法",
+  author: "DLX, xhkzdepartedream, kiwiizzz",
+  semester: "2025-2026-2"
+)
+
+// ===== 简洁表格辅助函数 =====
+// 自动均分列宽 + 加粗表头 + figure 包裹
+// 用法：
+//   #fig-tbl((h1, h2, h3),
+//     ([r1c1], [r1c2], [r1c3]),
+//     ([r2c1], [r2c2], [r2c3]))
+#let fig-tbl(header, ..rows) = {
+  let n = header.len()
+  let cells = ()
+  for row in rows.pos() { cells = cells + row }
+  figure(
+    align(center)[
+      #table(
+        columns: (1fr,) * n,
+        inset: 6pt,
+        stroke: none,
+        table.header(
+          ..header.map(h => table.cell(align: center)[#text(weight: "bold")[#h]])
+        ),
+        table.hline(),
+        ..cells
+      )
+    ],
+    kind: table
   )
-  set document(
-      author: authors.map(author => content-to-string(author.name)).join(", ", last: " & "),
-  ) if authors != none and authors != ()
-  set page(
-    paper: paper,
-    margin: margin,
-    numbering: pagenumbering,
-    columns: cols
-  )
-
-  set par(
-    justify: true,
-    leading: linestretch * 0.65em
-  )
-  set text(lang: lang,
-           region: region,
-           size: fontsize)
-
-  set text(font: font) if font != none
-  show math.equation: set text(font: mathfont) if mathfont != none
-  show raw: set text(font: codefont) if codefont != none
-
-  set heading(numbering: sectionnumbering)
-
-  show link: set text(fill: rgb(content-to-string(linkcolor))) if linkcolor != none
-  show ref: set text(fill: rgb(content-to-string(citecolor))) if citecolor != none
-  show link: this => {
-    if filecolor != none and type(this.dest) = label {
-      text(this, fill: rgb(content-to-string(filecolor)))
-    } else {
-      text(this)
-    }
-  }
-
-  if title != none {
-    place(top, float: true, scope: "parent", clearance: 4mm, block(below: 1em, width: 100%)[
-      #if title != none {
-        align(center, block[
-            #text(weight: "bold", size: 1.5em, hyphenate: false)[#title #if thanks != none {
-                footnote(thanks, numbering: "*")
-                counter(footnote).update(n => n - 1)
-              }]
-            #(
-              if subtitle != none {
-                parbreak()
-                text(weight: "bold", size: 1.25em, hyphenate: false)[#subtitle]
-              }
-             )])
-      }
-
-      #if authors != none and authors != [] {
-        let count = authors.len()
-        let ncols = calc.min(count, 3)
-        grid(
-          columns: (1fr,) * ncols,
-          row-gutter: 1.5em,
-          ..authors.map(author => align(center)[
-            #author.name \
-            #author.affiliation \
-            #author.email
-          ])
-        )
-      }
-
-      #if date != none {
-        align(center)[#block(inset: 1em)[
-            #date
-          ]]
-      }
-
-      #if abstract != none {
-        block(inset: 2em)[
-          #text(weight: "semibold")[#abstract-title] #h(1em) #abstract
-        ]
-      }
-    ])
-  }
-  doc
 }
-// #show: doc => conf(
-//   abstract-title: [Abstract],
-//   pagenumbering: "1",
-//   cols: 1,
-//   doc,
-// )
 
+#set heading(numbering: (..nums) => {
+  let level = nums.pos().len()
+  if level == 1 { return none }
+  else { return numbering("1.1", ..nums.pos().slice(1)) }
+})
+#set enum(numbering: "(1)")
 
-
-= 机器学习基本概念
+== 机器学习基本概念
 <机器学习基本概念>
-1. 请简述以下几种机器学习范式的区别,并各举一例：
+
+  + 请简述以下几种机器学习范式的区别,并各举一例：
 
     监督学习(Supervised Learning)、无监督学习(Unsupervised Learning)、半监督学习(Semi-supervised Learning)、强化学习(Reinforcement Learning)
 
   + 在机器学习建模过程中,一般包括哪些主要步骤？
 
-= 模型评估与选择计
+== 模型评估与选择计
 <模型评估与选择计>
 
   某二分类模型在测试集上的混淆矩阵如下：
 
-#figure(
-  align(center)[#table(
-    columns: (33.33%, 33.33%, 33.34%),
-    align: (auto,auto,auto,),
-    table.header([], [预测正类], [预测负类],),
-    table.hline(),
-    [实际正类], [45], [5],
-    [实际负类], [15], [35],
-  )]
-  , kind: table
-  )
+  #fig-tbl(("", "预测正类", "预测负类"),
+    ([实际正类], [45], [5]),
+    ([实际负类], [15], [35]))
 
-请计算以下指标(保留两位小数)：准确率(Accuracy)、精确率(Precision)、召回率(Recall)、F1
-值(F1-score)
+  请计算以下指标(保留两位小数)：准确率(Accuracy)、精确率(Precision)、
+  召回率(Recall)、F1值(F1-score)
 
-Acc:0.8;P:0.9;R:0.75;F1:$9/11$
-= 交叉验证与模型选择
+#answer[Acc:0.8;P:0.9;R:0.75;F1:$9/11$]
+
+== 交叉验证与模型选择
 <交叉验证与模型选择>
 在一个回归问题上使用了两种模型：线性回归(LR)与支持向量回归(SVR).
 
 使用 #strong[5 折]交叉验证得到平均 MSE 如下：
 
-#figure(
-  align(center)[#table(
-    columns: (14.16%, 14.32%, 14.32%, 14.32%, 14.33%, 14.33%, 14.21%),
-    align: (auto,auto,auto,auto,auto,auto,auto,),
-    table.header([模型], [Fold1], [Fold2], [Fold3], [Fold4], [Fold5], [平均
-      MSE],),
-    table.hline(),
-    [LR], [25], [28], [27], [30], [26], [?],
-    [SVR], [20], [23], [22], [21], [20], [?],
-  )]
-  , kind: table
-  )
+#fig-tbl(("模型", "Fold1", "Fold2", "Fold3", "Fold4", "Fold5", "平均MSE"),
+  ([LR], [25], [28], [27], [30], [26], [?]),
+  ([SVR], [20], [23], [22], [21], [20], [?]))
 
-(1) 计算两种模型的平均 MSE,并判断哪一个更优.
+  + 计算两种模型的平均 MSE，并判断哪一个更优。
 
-LR:27.2;SVR:21.2;后者更优.
+  + 简述交叉验证的主要作用。
 
-(2) 简述交叉验证的主要作用
+#answer[LR:27.2;SVR:21.2;后者更优.
+
 - 充分利用数据：将数据集轮流作训练集和验证集，避免浪费样本
 - 减少评估方差：多折结果取均值，评估比单次更稳定可靠
 - 防止过拟合：比在训练集上直接评估更能反映泛化能力
-- 用于模型选择与超参数调优：选择在交叉验证上表现最好的模型/参数
-= #strong[线性回归参数求解(最小二乘法)]
+- 用于模型选择与超参数调优：选择在交叉验证上表现最好的模型/参数]
+
+== #strong[线性回归参数求解(最小二乘法)]
 <线性回归参数求解最小二乘法>
 已知简单线性回归模型为：$y = w_0 + w_1 x + epsilon$,其中,$epsilon$
 为误差项.现有一组样本数据如下：
@@ -224,27 +143,33 @@ LR:27.2;SVR:21.2;后者更优.
 请使用#strong[最小二乘法]求解模型参数 $w_0$(截距)和
 $w_1$​(斜率),并写出关键计算步骤.
 
-$ w = (X^T X)^(-1) X^T y $
+#answer[$ w = (X^T X)^(-1) X^T y $
 
 $X = mat(1,1;1,2;1,3;1,4;1,5),y = mat(2;4;5;4;5)$.考虑使用增广矩阵求逆矩阵(以防你忘了,$[A|I] -> [I|A^(-1)]$).
 带入得到
-$ w = 2.2,w_0 = 0.6 $
+$ w = 2.2,w_0 = 0.6 $]
 
-= #strong[岭回归正则化效果分析]
+== #strong[岭回归正则化效果分析]
 <岭回归正则化效果分析>
 已知某多元线性回归问题中,特征矩阵 X
 存在多重共线性(如两个特征高度相关),分别使用普通线性回归和岭回归(Ridge
 Regression) 建模,回答以下问题：
 
-#block[
+  + 多重共线性会对普通线性回归的参数估计产生什么影响？(从参数稳定性、方差角度说明)
+
+  + 岭回归通过引入正则化项 $lambda sum_(j = 1)^p w_j^2$ ($lambda gt.eq 0$, p 为特征数)解决该问题,简述正则化项的作用.
+
+  + 当正则化参数 $lambda$ 分别取以下值时,分析对岭回归模型参数 $w_j$ 和模型泛化能力的影响：$lambda$ = 0; $lambda$ 趋近于正无穷.
+
+#answer[
 #set enum(numbering: "(1)", start: 1)
 + 多重共线性会对普通线性回归的参数估计产生什么影响？(从参数稳定性、方差角度说明)
-  \ 
+  \
   $(X^T X)^(-1)$元素会很大,数据的微小扰动会导致$ w = (X^T X)^(-1) X^T y $的w变化很大.并且,参数估计方差爆炸，模型不可信.
 
   (2) 岭回归通过引入正则化项$lambda sum_(j = 1)^p w_j^2$
   ($lambda gt.eq 0$, p 为特征数)解决该问题,简述正则化项的作用. \
-  
+
 $ w^* = (X^T X+lambda I)^(-1) X^T y $,保证前者可逆,以引入少量偏差为代价，大幅降低参数估计方差（偏差-方差权衡）
 
 
@@ -252,10 +177,10 @@ $ w^* = (X^T X+lambda I)^(-1) X^T y $,保证前者可逆,以引入少量偏差�
   和模型泛化能力的影响：$lambda$ = 0; $lambda$ 趋近于正无穷.
 
   前者退化为普通线性回归，多重共线性下参数方差极大训练集拟合好但泛化差，易过拟合;后者正则项主导，所有$ w_j→0$
-，模型趋于常数预测欠拟合，偏差极大，泛化能力也差
+  ，模型趋于常数预测欠拟合，偏差极大，泛化能力也差
 ]
 
-= #strong[贝叶斯分类器计算]
+== #strong[贝叶斯分类器计算]
 <贝叶斯分类器计算>
 假设一个二分类问题(类别 $C_1$ 与 $C_2$),观测特征为 $x$.已知如下信息
 
@@ -266,11 +191,17 @@ $ w^* = (X^T X+lambda I)^(-1) X^T y $,保证前者可逆,以引入少量偏差�
 请根据贝叶斯定理计算后验概率 $P\(C_1\|x\)$ 和 $P\(C_2\|x\)$
 ,并判断样本属于哪一类.
 
-$30/38;8/38$.属于$C_1$.
+#answer[$30/38;8/38$.属于$C_1$.]
 
-= #strong[朴素贝叶斯分类器原理分析]
+== #strong[朴素贝叶斯分类器原理分析]
 <朴素贝叶斯分类器原理分析>
-(1) 简述朴素贝叶斯(Naïve Bayes)分类器的基本假设;
+  + 简述朴素贝叶斯(Naïve Bayes)分类器的基本假设;
+
+  + 说明这一假设的优缺点;
+
+  + 其常见变体有哪些？
+
+#answer[(1) 简述朴素贝叶斯(Naïve Bayes)分类器的基本假设;
 
 假设特征之间相对独立,也就是$
 PP(X|Y=c_k) = Pi_(i=1)^n PP(X^((i))|Y=c_k)
@@ -286,9 +217,9 @@ $
 
 (3) 其常见变体有哪些？
 - 半朴素贝叶斯分类器:适当考虑一部分属性间的相互依赖信息，避免完全联合概率计算的高复杂性，同时不彻底忽略较强的属性依赖关系。.
-- SPODE,TAN,AODE
+- SPODE,TAN,AODE]
 
-= AdaBoost 权重更新与样本分布变化
+== AdaBoost 权重更新与样本分布变化
 <adaboost-权重更新与样本分布变化>
 给定一个二分类数据集：
 
@@ -300,21 +231,19 @@ $
 
 第一个弱分类器 $h_1\(x\)$ 的预测如下：
 
-#figure(
-  align(center)[#table(
-    columns: (49.92%, 50.08%),
-    align: (center,center,),
-    table.header(table.cell(align: center)[#strong[样本]], table.cell(align: center)[$ upright(bold(h))_(upright(bold(1))) upright(bold(\()) upright(bold(x))_(upright(bold(i))) upright(bold(\))) $],),
-    table.hline(),
-    table.cell(align: center)[A], table.cell(align: center)[+1],
-    table.cell(align: center)[B], table.cell(align: center)[+1],
-    table.cell(align: center)[C], table.cell(align: center)[-1],
-    table.cell(align: center)[D], table.cell(align: center)[+1],
-  )]
-  , kind: table
-  )
+#fig-tbl(([样本], [$bold(h)_1(bold(x)_i)$]),
+  ([A], [+1]),
+  ([B], [+1]),
+  ([C], [-1]),
+  ([D], [+1]))
 
-\(1)
+  + 计算弱分类器权重：$alpha_1 = 1 / 2 ln frac(1 - epsilon_1, epsilon_1)$
+
+  + 计算新的样本分布 $D_2(i)$
+
+  + 请分析哪些样本的权重会上升？这意味着 AdaBoost 下一轮学习时会偏向哪些样本？解释其原因.
+
+#answer[\(1)
 计算弱分类器权重：$alpha_1 = 1 / 2 ln frac(1 - epsilon_1, epsilon_1)$​​
 
 $epsilon_1 = 1/4$,
@@ -324,21 +253,27 @@ $alpha_1 = (ln 3)/2 $
 + 计算新的样本分布 $D_2\(i\)$.
   #image("/assets/image-19.png")
   自己代入,我不想敲了
-  
+
 ]
 
 \(3) 请分析哪些样本的权重会上升？这意味着 AdaBoost
 下一轮学习时会偏向哪些样本？解释其原因.
 
-样本 D 的权重从 0.25 上升到 0.5，因为它是唯一被 $h_1$错误分类的样本。AdaBoost 的核心机制是：下一轮弱分类器将重点关注当前轮分类错误的样本，通过提高其权重，迫使下一个弱学习器将注意力集中于难分样本，最终多个弱分类器互补形成强分类器。
+样本 D 的权重从 0.25 上升到 0.5，因为它是唯一被 $h_1$错误分类的样本。AdaBoost 的核心机制是：下一轮弱分类器将重点关注当前轮分类错误的样本，通过提高其权重，迫使下一个弱学习器将注意力集中于难分样本，最终多个弱分类器互补形成强分类器。]
 
-= Bagging 模型方差与集成优点
+== Bagging 模型方差与集成优点
 <bagging-模型方差与集成优点>
 某回归问题中,单个基学习器的输出方差为
 $V a r\(T_i\)= 1.2$,不同学习器之间的预测相关系数为 $rho = 0.2$.共有
 $N = 50$ 个学习器.
 
-\(1)
+  + 计算集成预测输出的 #strong[总体方差]：$V a r\(macron(T)\)= rho V a r\(T_i\)+ frac(1 - rho, N) V a r\(T_i\)$
+
+  + 若改为 $N = 200$ 个学习器,新的方差是多少？
+
+  + 结合计算结果,Bagging 模型减少方差的机制是什么？为何当学习器越多、相关性越低时效果越好？
+
+#answer[\(1)
 计算集成预测输出的#strong[总体方差]：$V a r\(macron(T)\)= rho V a r\(T_i\)+ frac(1 - rho, N) V a r\(T_i\)$
 
 直接代入,答案是0.2592
@@ -351,45 +286,53 @@ $N = 50$ 个学习器.
 
 N大.第二项越小，集成方差越低
 
-$rho$小,第一项小,第二项($1-rho$)可消除的更多
+$rho$小,第一项小,第二项($1-rho$)可消除的更多]
 
-= PCA 主成分方向与投影
+== PCA 主成分方向与投影
 <pca-主成分方向与投影>
 给定数据集如下,#strong[每一行]是一条样本：
 
 $ X = mat(delim: "[", 2, 0, 1; 3, 1, 2; 4, 0, 3; 5, 2, 4; 6, 3, 5) $
 
-#block[
+  + 求特征值与特征向量，并将特征向量进行单位化。
+
+  + 指出主成分方向，并计算方差贡献率。
+
+  + 对样本 $x = [4, 0, 3]^T$，计算其在第一主成分上的投影。
+
+  + 如果仅保留第一主成分，原始三维信息会损失多少？此损失代表什么含义？
+
+#answer[
 #set enum(numbering: "(1)", start: 1)
 + 求特征值与特征向量,,并将特征向量进行单位化. \
-  
+
   $ overline(X) = mat(-2,-1.2,2;-1,-0.2,1;0,1.2,0;1,0.8,1;2,1.8,2)$
 
   协方差矩阵$C = 1/(n-1) overline(X)^T overline(X)$,$n$样本数量
-  $ overline(X)^T overline(X) &= mat(10,7,10;7,34/5,7;10,7,10) \ 
+  $ overline(X)^T overline(X) &= mat(10,7,10;7,34/5,7;10,7,10) \
     C &= mat(5/2,7/4,5/2;7/4,17/10,7/4;5/2,7/4,5/2)
   $
-  $ det(C - lambda I) &= 0 \   
-    <==>lambda^3 - 67/10 lambda^2 +19/8 &=0 \ 
+  $ det(C - lambda I) &= 0 \
+    <==>lambda^3 - 67/10 lambda^2 +19/8 &=0 \
     <==>lambda&= 0,(67 plus.minus sqrt(3539))/(20)
   $
   向量是$(1,(67 plus.minus sqrt(3539))/(20),1),(-1,0,1)$.
   我不想归一化.
-  
-  
-+ 指出主成分方向,并计算方差贡献率. \ 
+
+
++ 指出主成分方向,并计算方差贡献率. \
   不想手算.计算器告诉我分别是0.9439,0.0560,0.
-  
+
 +  对样本
-  $x =\[4\,med 0\,med 3\]^T$,计算其在第一主成分上的投影. \ 
+  $x =\[4\,med 0\,med 3\]^T$,计算其在第一主成分上的投影. \
   $overline(x) = [0,-1.2,0]^T$.直接乘特征向量,答案是0.566.
 
 + 如果仅保留第一主成分,原始三维信息会损失多少？此损失代表什么含义？
-  
+
   损失5.6%.对应第二主成分方向上的信息.
 ]
 
-= #strong[K-Means 聚类迭代与收敛分析]
+== #strong[K-Means 聚类迭代与收敛分析]
 <k-means-聚类迭代与收敛分析>
 一维数据集：
 
@@ -399,9 +342,15 @@ $ x = { 1\,2\,3\,10\,11\,12 } $
 
 $ mu_1 = 2\,quad mu_2 = 10 $
 
-#block[
+  + 执行两次完整的 K-Means 迭代,每次写出簇分配与新的中心.
+
+  + 说明两步后算法是否收敛.
+
+  + 若初始中心改为 $mu_1 = 3$, $mu_2 = 12$,结果会怎样变化？为什么 K-Means 对初始化敏感？
+
+#answer[
 #set enum(numbering: "(1)", start: 1)
-+ 执行两次完整的 K-Means 迭代,每次写出簇分配与新的中心. \ 
++ 执行两次完整的 K-Means 迭代,每次写出簇分配与新的中心. \
   第一次:计算中心,距离分别为$
   mat(1,0,1,8,9,10;
   9,8,7,0,1,2
@@ -411,8 +360,8 @@ $ mu_1 = 2\,quad mu_2 = 10 $
   $ mu_1 = 2\,quad mu_2 = 11 $
 
   第二次不赘述,完全相同.
-+ 说明两步后算法是否收敛. \ 
-  
++ 说明两步后算法是否收敛. \
+
   收敛.因为完全相同了
 
 + 若初始中心改为
@@ -421,7 +370,7 @@ $ mu_1 = 2\,quad mu_2 = 10 $
   结果相同.初始化敏感是因为,K-Means 只保证收敛到局部最优,如果初始化很不好,算法会收敛到分割质量很差的局部最优解,例如,在簇间距小或分布复杂时,且初始化的两个中心都落在同一簇内.
 ]
 
-= #strong[高斯混合模型 (GMM)] 
+== #strong[高斯混合模型 (GMM)]
 <高斯混合模型-gmm>
 有两个一维高斯成分：
 
@@ -431,7 +380,13 @@ $ mu_1 = 2\,quad mu_2 = 10 $
 
 给定样本 $x = 1$.
 
-\(1) 写出每个成分的后验概率(职责)：
+  + 写出每个成分的后验概率(职责)：$gamma_k(x) = frac(pi_k cal(N)(x|mu_k, sigma_k^2), sum_(j=1)^2 pi_j cal(N)(x|mu_j, sigma_j^2))$，并代入数值计算.
+
+  + 求两成分的责任度比值 $frac(gamma_1(x), gamma_2(x))$
+
+  + 分析哪个成分对该样本的解释更大？如果两个高斯方差变大,职责会发生什么变化？这说明了 GMM 的哪种鲁棒性问题？
+
+#answer[\(1) 写出每个成分的后验概率(职责)：
 
 $ gamma_k\(x\)= frac(pi_k thin cal(N)\(x\|mu_k\,sigma_k^2\), sum_(j = 1)^2 pi_j thin cal(N)\(x\|mu_j\,sigma_j^2\)) $
 
@@ -441,8 +396,8 @@ $ gamma_k\(x\)= frac(pi_k thin cal(N)\(x\|mu_k\,sigma_k^2\), sum_(j = 1)^2 pi_j 
 
 #block[
 #set enum(numbering: "(1)", start: 2)
-+ 求两成分的责任度比值 $frac(gamma_1\(x\), gamma_2\(x\))$​. \ 
-  2.98  
++ 求两成分的责任度比值 $frac(gamma_1\(x\), gamma_2\(x\))$​. \
+  2.98
 (3)
   分析哪个成分对该样本的解释更大？如果两个高斯方差变大,职责会发生什么变化？这说明了
   GMM 的哪种鲁棒性问题？
@@ -451,28 +406,27 @@ $ gamma_k\(x\)= frac(pi_k thin cal(N)\(x\|mu_k\,sigma_k^2\), sum_(j = 1)^2 pi_j 
 
   这说明当方差过大时，GMM 对样本的"软分配"几乎退化为纯先验，失去了用数据更新责任度的意义，模型对数据的拟合能力下降（欠拟合）。反之方差过小则过拟合。这反映了 GMM 参数（尤其方差）对 EM 迭代结果的敏感性问题。
 ]
-
-= 硬间隔 SVM 的最优超平面计算
+]
+== 硬间隔 SVM 的最优超平面计算
 <硬间隔-svm-的最优超平面计算>
 给定二维样本集：
-#import "@preview/cetz:0.4.1": canvas
-#import "@preview/cetz-plot:0.1.0": plot
-#figure(
-  align(center)[#table(
-    columns: (33.24%, 33.47%, 33.28%),
-    align: (center,center,center,),
-    table.header(table.cell(align: center)[#strong[样本]], table.cell(align: center)[#strong[特征]
-      $upright(bold(\()) upright(bold(x))_(upright(bold(1))) upright(bold(\,med)) upright(bold(x))_(upright(bold(2))) upright(bold(\)))$], table.cell(align: center)[#strong[标签]
-      $upright(bold(y))$],),
-    table.hline(),
-    table.cell(align: center)[A], table.cell(align: center)[$ upright(bold(\()) 0\,med 0 upright(bold(\))) $], table.cell(align: center)[+1],
-    table.cell(align: center)[B], table.cell(align: center)[$ \(1\,med 1\) $], table.cell(align: center)[−1],
-    table.cell(align: center)[C], table.cell(align: center)[$ \(2\,med 0\) $], table.cell(align: center)[-1],
-  )]
-  , kind: table
-  )
 
-(1)写出线性可分 SVM 的优化目标函数(原始形式).
+#fig-tbl(([样本], [特征 $(x_1,x_2)$], [标签 $y$]),
+  ([A], [$(0,0)$], [+1]),
+  ([B], [$(1,1)$], [-1]),
+  ([C], [$(2,0)$], [-1]))
+
+  + 写出线性可分 SVM 的优化目标函数(原始形式).
+
+  + 画出这些点在平面上的分布,并给出直观的分界线方向.
+
+  + 将该问题化为拉格朗日对偶问题,求出支持向量与对偶变量 $alpha_i$ 的非零条件.
+
+  + 求出最优分离超平面方程 $w^top x + b = 0$.
+
+  + 计算分类间隔的宽度.
+
+#answer[(1)写出线性可分 SVM 的优化目标函数(原始形式).
 
 $
   &min_(w,b) 1/2 norm(w)^2 quad,
@@ -504,8 +458,9 @@ $
 
 $
 d = 2/norm(w) = sqrt(2).
-$
-= 核函数与软间隔SVM
+$]
+
+== 核函数与软间隔SVM
 <核函数与软间隔svm>
 已知 SVM 的对偶形式为：
 
@@ -515,43 +470,53 @@ $ max_alpha med sum_i^() alpha_i - 1 / 2 sum_i^() sum_j^() alpha_i alpha_j y_i y
 
   + 若使用高斯核 $K(x_i, x_j) = e^(- norm(x_i - x_j)^2)$，说明此核在特征空间的非线性映射性质.
 
+  + 分析参数 $C$ 过大或过小时对应"欠惩罚"和"过惩罚"的几何解释.
+
+  + 给出硬间隔与软间隔 SVM 的几何差别示意(可用文字或符号说明支持向量位置变化).
+
+  + 说明核函数必须满足的两个基本条件.
+
+#answer[
+  + 若使用高斯核 $K(x_i, x_j) = e^(- norm(x_i - x_j)^2)$，说明此核在特征空间的非线性映射性质.
+
   对应无穷维的隐式特征空间映射$phi$.等价于在无穷维特征空间中做内积，使原本线性不可分的样本在高维空间中变得线性可分，而计算时只需原始空间的距离，无需显式构造高维向量.
 
 + 分析参数 $C$ 过大或过小时对应"欠惩罚"和"过惩罚"的几何解释;
  C小:误分类惩罚低，允许更多样本落入间隔内甚至越界，决策边界间隔宽，但训练误差大，模型偏向欠拟合;C过大:不允许任何误分类，决策边界尽量将所有点正确分开，间隔窄，边界紧贴数据，易过拟合，对噪声敏感
-]
+
 
   + 给出硬间隔与软间隔 SVM 的几何差别示意(可用文字或符号说明支持向量位置变化).
 
   + 说明核函数必须满足的两个基本条件.
 
 - 正定的,也就是Gram矩阵半正定;
-- 对称性:$K(x_i,x_j) = K(x_j,x_i)$
-= 决策树构建与剪枝分析
+- 对称性:$K(x_i,x_j) = K(x_j,x_i)$]
+
+== 决策树构建与剪枝分析
 <决策树构建与剪枝分析>
 给定以下训练数据集(二维离散特征)：
 
-#figure(
-  align(center)[#table(
-    columns: (24.99%, 24.98%, 24.99%, 25.05%),
-    align: (center,center,center,center,),
-    table.header(table.cell(align: center)[#strong[样本]], table.cell(align: center)[#strong[天气]], table.cell(align: center)[#strong[湿度]], table.cell(align: center)[#strong[是否打球(标签)]],),
-    table.hline(),
-    table.cell(align: center)[A], table.cell(align: center)[晴], table.cell(align: center)[高], table.cell(align: center)[否],
-    table.cell(align: center)[B], table.cell(align: center)[晴], table.cell(align: center)[正常], table.cell(align: center)[是],
-    table.cell(align: center)[C], table.cell(align: center)[阴], table.cell(align: center)[高], table.cell(align: center)[是],
-    table.cell(align: center)[D], table.cell(align: center)[阴], table.cell(align: center)[正常], table.cell(align: center)[是],
-    table.cell(align: center)[E], table.cell(align: center)[雨], table.cell(align: center)[高], table.cell(align: center)[否],
-    table.cell(align: center)[F], table.cell(align: center)[雨], table.cell(align: center)[正常], table.cell(align: center)[是],
-  )]
-  , kind: table
-  )
+#fig-tbl(("样本", "天气", "湿度", "是否打球(标签)"),
+  ([A], [晴], [高], [否]),
+  ([B], [晴], [正常], [是]),
+  ([C], [阴], [高], [是]),
+  ([D], [阴], [正常], [是]),
+  ([E], [雨], [高], [否]),
+  ([F], [雨], [正常], [是]))
 
-#block[
+  + 计算在主节点上按"天气"划分时的信息增益,并判断是否是最优划分特征.
+
+  + 画出对应的决策树结构(可用文字层次描述代替图形).
+
+  + 若使用"基尼指数"作为划分标准,比较与信息增益的划分结果是否一致.
+
+  + 简述决策树容易过拟合的原因,并说明两种剪枝方法(预剪枝 / 后剪枝)的思路.
+
+#answer[
 #set enum(numbering: "(1)", start: 1)
 + 计算在主节点上按"天气"划分时的信息增益,并判断是否是最优划分特征.
   $
-    H(D)&=-sum_(k=1)^K frac(|C_k|,|D|)log_2frac(|C_k|,|D|)\ 
+    H(D)&=-sum_(k=1)^K frac(|C_k|,|D|)log_2frac(|C_k|,|D|)\
     &= -4/6(log_2 4/6)-2/6 log_2 2/6 = log_2 3 - 2/3
   $
   $
@@ -593,25 +558,25 @@ $ max_alpha med sum_i^() alpha_i - 1 / 2 sum_i^() sum_j^() alpha_i alpha_j y_i y
   后剪枝（Post-pruning）： 先将树完全生长，再自底向上将子树替换为叶节点（如 CCP、REP 等），若替换后验证集误差不增加则保留剪枝。保留了更多信息，通常效果优于预剪枝，但计算开销更大。
 ]
 
-= #strong[强化学习：价值迭代与策略改进]
+== #strong[强化学习：价值迭代与策略改进]
 <强化学习价值迭代与策略改进>
 给定两个状态的 MDP：
 
-#figure(
-  align(center)[#table(
-    columns: (25%, 25%, 25%, 25%),
-    align: (center,center,center,center,),
-    table.header(table.cell(align: center)[#strong[状态]], table.cell(align: center)[#strong[动作]], table.cell(align: center)[#strong[奖励]], table.cell(align: center)[#strong[下一状态]],),
-    table.hline(),
-    table.cell(align: center)[$s_1$], table.cell(align: center)[$a_1$], table.cell(align: center)[$4$], table.cell(align: center)[$s_2$],
-    table.cell(align: center)[$s_2$], table.cell(align: center)[$a_1$], table.cell(align: center)[$1$], table.cell(align: center)[$s_1$],
-  )]
-  , kind: table
-  )
+#fig-tbl(("状态", "动作", "奖励", "下一状态"),
+  ([$s_1$], [$a_1$], [4], [$s_2$]),
+  ([$s_2$], [$a_1$], [1], [$s_1$]))
 
 折扣因子 $gamma = 0.5$,初始 $V_0\(s_1\)= V_0\(s_2\)= 0$.
 
-(1)写出价值迭代更新公式;
+  + 写出价值迭代更新公式;
+
+  + 分别计算 $V_1$, $V_2$, $V_3$;
+
+  + 判断策略是否随迭代发生变化;
+
+  + 解释价值迭代与策略迭代的关系与收敛特征.
+
+#answer[(1)写出价值迭代更新公式;
 $ V_(k+1)(s) = max_a [ R(s, a) + gamma sum_(s') PP(s'|s, a) V_k (s') ] $
 
 
@@ -629,8 +594,9 @@ $V_1(s_1) = 4,V_1(s_2) = 1;V_2(s_1) = 4.5,V_2(s_2) = 3;V_3(s_1) = 5.5,V_3(s_2) =
 
 
 #image("/assets/image-20.png")
-bro wtf is this
-= #strong[单隐藏层网络的反向传播计算]
+bro wtf is this]
+
+== #strong[单隐藏层网络的反向传播计算]
 <单隐藏层网络的反向传播计算>
 一个简单神经网络结构如下： 输入层(2维)→ 隐藏层(2个神经元,Sigmoid
 激活)→ 输出层(1个神经元,线性输出)
@@ -655,7 +621,7 @@ bro wtf is this
   + 若将激活函数改为ReLU,说明梯度表达式怎样简化,且在何种输入下可能出现神经元失活(dead neuron).
 
 #answer[
- 
+
 
 (1) 前向传播
 
@@ -710,10 +676,10 @@ ReLU：$ "ReLU"(z) = max(0, z) $，导数 $ "ReLU"'(z) = cases(1 & "如果" z > 
 死亡神经元（Dead Neuron）： 当某神经元的输入 $z <= 0$ 时，ReLU 输出为0，梯度为0，该神经元对反向传播无贡献，参数永远不更新。若学习率过大导致权重更新后 $z$ 持续为负，该神经元将永久失活。常见触发条件：初始化不当、学习率过大、偏置为大负数时。
 ]
 
-= #strong[写出罗杰斯特回归模型学习的梯度下降算法.]
+== #strong[写出Logistic模型学习的梯度下降算法.]
 <写出罗杰斯特回归模型学习的梯度下降算法>
 
-*笔记2.3*
+#answer[*笔记2.3*
 
 
 $
@@ -727,16 +693,16 @@ $pi(x_i)=1/(1+exp(-w dot x_i+b))$是logistic函数，表示样本$x_i$属于正�
 
 梯度下降法具体的更新公式为：
 $
-  w^((k+1))=w^((k))-alpha nabla J(w^((k)))=w^((k))-alpha sum_(i=1)^N x_i (pi(x_i)-y_i)\  
+  w^((k+1))=w^((k))-alpha nabla J(w^((k)))=w^((k))-alpha sum_(i=1)^N x_i (pi(x_i)-y_i)\
   b^((k+1))=b^((k))-alpha sum_(i=1)^N (pi (x_i)-y_i)
-$
-= #strong[试从极大似然的角度阐释线性回归;在什么情况下,岭回归等价于最大后验概率估计？请给出理论解释.]
+$]
+
+== #strong[试从极大似然的角度阐释线性回归;在什么情况下,岭回归等价于最大后验概率估计？请给出理论解释.]
 <试从极大似然的角度阐释线性回归在什么情况下岭回归等价于最大后验概率估计请给出理论解释>
 
-#image("/assets/image-21.png")
+#answer[#image("/assets/image-21.png")]
 
-
-= #strong[机器学习综合题]
+== #strong[机器学习综合题]
 <机器学习综合题>
 某银行希望利用机器学习模型自动评估客户的信用风险.每位客户的特征如下：
 
@@ -776,16 +742,12 @@ $
     已知：$x = [1, 2]^T$，$W_1 = mat(0.5, -0.4; 0.3, 0.1)$，
     $b_1 = [0, 0]^T$，$W_2 = [0.6, -0.2]^T$，$b_2 = 0$
 
-请计算：隐藏层输出 $h = sigma\(W_1 x + b_1\)$;最终输出
-$hat(y) = sigma\(W_2^T h + b_2\)$.
+    请计算：隐藏层输出 $h = sigma(W_1 x + b_1)$；最终输出
+    $hat(y) = sigma(W_2^T h + b_2)$。
 
-(其中 $sigma\(a\)= frac(1, 1 + e^(- a))$,保留两位小数即可)
+    其中 $sigma(a) = 1 / (1 + e^(-a))$，保留两位小数即可
 
-(5)结合本任务特征特点与数据量(仅约 100
-条样本),分析：若仅能选择决策树 / SVM /
-神经网络三种之一,你会选择哪种？请从数据规模、特征类型、模型可解释性等方面说明理由.
-
-
+  + 结合本任务特征特点与数据量(仅约 100 条样本),分析：若仅能选择决策树 / SVM / 神经网络三种之一,你会选择哪种？请从数据规模、特征类型、模型可解释性等方面说明理由.
 
 #answer[
   (1)收入水平用顺序编码,高中低分别编码成2,1,0.是否有房编码成onehot.
@@ -797,13 +759,13 @@ $hat(y) = sigma\(W_2^T h + b_2\)$.
   则
   $G(A) = 2/3$
   定性分析:可以.信息增益 0.667 较高，收入水平能有效区分高/低风险，选择收入水平作为首个划分节点是合理的.
-  
+
   定量分析:算一下是否有房和违约次数的信息增量.
 
   (3)C 较大意味着对误分类施以重惩罚，SVM 的决策边界会尽量将所有训练样本正确分类：
    - 间隔变窄：为了不允许误分类，边界紧贴支持向量，分类间隔（margin）减小
    - 过拟合风险上升：模型对噪声和异常点敏感，泛化能力可能下降
-  
+
   (4)直接代入$h = sigma\(W_1 x + b_1\) = sigma([-0.3,0.5]^T) = [0.43,0.62]^T$
 
   $hat(y) = sigma\(W_2^T h + b_2\) = sigma(0.134) = 0.53$
