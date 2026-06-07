@@ -614,6 +614,7 @@ $ E(f; D) = "bias"^2(x) + "var"(x) + epsilon^2 $
 #figure(
    image("/assets/image-1.png"),
    caption:[
+      
       10折交叉验证示意图.提问：k折交叉验证会得到k个参数不同的模型，那么最终使用哪一个呢?
 #note[
       都不用.基于平均结果，确定哪种模型配置（如不同的超参数、
