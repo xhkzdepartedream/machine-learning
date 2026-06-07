@@ -1,4 +1,5 @@
 #import "@local/ysz_tools:0.1.0": *
+#import "@preview/in-dexter:0.7.2": index
 #show: thmbox-init(counter-level: 3)
 
 == $k$近邻法
@@ -9,7 +10,7 @@ $k$近邻法假设给定一个训练数据集，其中实例类别已定。分�
 
 利用训练数据集对特征向量空间进行划分，并作为其分类的模型。*$k$值的选择、距离度量*及*分类决策规则*是$k$近邻法的3个基本要素。
 
-=== $k$近邻算法
+=== $k$近邻算法#index[k近邻法]
 
 #algorithm[$k$近邻算法][
 *输入*：训练数据集

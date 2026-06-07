@@ -1,4 +1,5 @@
 #import "@local/ysz_tools:0.1.0": *
+#import "@preview/in-dexter:0.7.2": index
 
 = 半监督学习
 == 未标记样本与半监督学习
@@ -8,7 +9,7 @@
 
 例如，在医学影像分析中，医院可以轻易获得数以万计的医学影像，但是如果希望医学专家对这些影像中的病灶进行逐一精确标识，则是不现实的。
 
-#definition[半监督学习 (Semi-Supervised Learning)][
+#definition[半监督学习 (Semi-Supervised Learning)][#index[半监督学习]
   让学习器不依赖外界交互，自动地利用未标记样本来提升学习性能的学习方法，即为半监督学习。
 ]
 
@@ -33,7 +34,7 @@
 2. *(纯) 半监督学习 (Pure Semi-Supervised Learning)*：
    自动利用未标记样本，不需要与外界交互。它是基于*开放世界假设 (Open World Assumption)*，即假定训练集中的未标记样本并非最终的待预测样本，目标是获得对未知新样本的最优泛化性能。
 
-3. *直推学习 (Transductive Learning)*：
+3. *直推学习 (Transductive Learning)*：#index[直推学习]
    同样不与外界交互。但它是基于*封闭世界假设 (Closed World Assumption)*，假定学习过程中观察到的未标记样本恰好就是待预测的测试数据，目标是仅在这些特定的未标记样本上取得最优预测效果。
 #cetz.canvas({
   // 1. 显式调用 set-style，避免使用 import cetz.draw: * 覆盖原生函数

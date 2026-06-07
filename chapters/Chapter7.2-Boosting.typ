@@ -1,12 +1,13 @@
 #import "@local/ysz_tools:0.1.0": *
+#import "@preview/in-dexter:0.7.2": index
 #show: thmbox-init(counter-level: 3)
 
 == Boosting
 Boosting是一种常用的机器学习方法，应用广泛且有效。在分类问题中，它*通过改变训练样本的权重学习多个分类器，并将这些分类器进行线性组合，提高分类的性能。*
 
-=== AdaBoost算法
+=== AdaBoost算法#index[AdaBoost]
 
-Boosting从弱学习算法出发，反复学习，得到一系列弱分类器（又称为基本分类器），然后组合这些弱分类器，构成一个强分类器。
+Boosting从弱学习算法出发，反复学习，得到一系列弱分类器#index[弱分类器]（又称为基本分类器），然后组合这些弱分类器，构成一个强分类器。
 
 大多数的Boosting都是改变训练数据的概率分布（训练数据的权值分布)，针对不同的训练数据分布调用弱学习算法学习一系列弱分类器。
 

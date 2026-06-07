@@ -1,11 +1,12 @@
 #import "@local/ysz_tools:0.1.0": *
+#import "@preview/in-dexter:0.7.2": index
 
 = 强化学习
 == 强化学习基本设置
 
 === 强化学习的直观理解与应用场景
 
-强化学习 (Reinforcement Learning, RL) 致力于解决智能体 (Agent) 在与环境 (Environment) 的不断交互中学习最优决策序列的问题。
+强化学习 (Reinforcement Learning, RL) 致力于解决智能体 (Agent) 在与环境 (Environment) 的不断交互中学习最优决策序列的问题。#index[强化学习]
 
 *典型应用场景*：
 - 机器人控制（如 Boston Dynamics 的机器狗、双足机器人行走）
@@ -19,7 +20,7 @@
 
 强化学习的基础数学框架是马尔可夫决策过程。
 
-#definition[马尔可夫决策过程][
+#definition[马尔可夫决策过程][#index[马尔可夫决策过程]
 MDP 是对强化学习环境交互过程的严格数学抽象。它*假设环境的下一个状态仅依赖于当前状态和当前动作*，而与更早的历史状态无关（即马尔可夫性）。
 ]
 

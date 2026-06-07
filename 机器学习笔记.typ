@@ -1,4 +1,6 @@
 #import "@local/ysz_tools:0.1.0": *
+#import "@preview/in-dexter:0.7.2": index, make-index
+
 #set text(size: 9pt)
 #show: conf.with(
   sidebar:false,
@@ -6,15 +8,24 @@
   author: "bjhh2025, xhkzdepartedream, kiwiizzz, zoomy",
   date: "2026.6"
 )
-#show heading: set block(below: 0em) // 默认值通常较大，可以改成 0.8em 或更小
+#show heading: set block(below: -0.1em) // 默认值通常较大，可以改成 0.8em 或更小
 #set footnote.entry(
   // 上方横线：默认只有 30% 宽，我们把它改成 100% 满宽，并设置粗细
   separator: line(length: 100%, stroke: 0.5pt),
   // clearance: 1.5em, // 脚注与正文之间的间距
   // gap: 0.8em,       // 多个脚注之间的间距
 )
-
-
+// #set page(margin: (
+//   top: 1cm,
+//   bottom: 1cm,
+//   left: 1cm,
+//   right: 1cm
+// ))
+#set par(
+  //leading: 0.6em,   // 缩短后的行间距（在此处生效）
+  spacing: 0.65em,  // 段落与段落之间的间距
+  justify: true     // 两端对齐
+)
 // 2. 利用 show 规则在整个脚注区域的“下方”再加一条横线
 #show footnote.entry: it => {
   it // 渲染脚注内容本身
@@ -25,7 +36,12 @@
 // #include "前言.typ"
 // #pagebreak()
 
-#outline(depth: 3)
+#show outline.entry: it => {
+  block(above: 0.5em, below: 0.5em)[#it]
+}
+#columns(2)[
+  #outline(depth: 3)
+]
 #pagebreak()
 #include "chapters/Chapter1&2-机器学习概论.typ"
 
@@ -61,4 +77,10 @@
 // #include "appendix/最优化算法.typ"
 
 // #include "appendix/奇异值分解.typ"
+
+#pagebreak()
+= 名词索引
+#columns(4)[
+  #make-index(title: none)
+]
 
