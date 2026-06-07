@@ -57,19 +57,19 @@ $
 $
   L(w)&=sum_(i=1)^N [y_i log pi(x_i)+(1-y_i) log(1-pi(x_i))]\
   &=sum_(i=1)^N [y_i log frac(pi(x_i), 1-pi(x_i))+log(1-pi(x_i))]\
-  &=sum_(i=1)^N {y_i (w dot x_i)-log[1+exp(w dot x_i)]}
+  &=sum_(i=1)^N {y_i (w dot x_i+b)-log[1+exp(w dot x_i + b)]}
 $
 对$L(w)$求极大值，得到$w$的估计值$hat(w)$。这样问题变成了以对数似然函数为目标函数的最优化问题。逻辑斯蒂回归学习中通常采用的方法是*梯度下降法*和*拟牛顿法*。
 
 负对数似然函数定义为：
 $
-  J(w)=-L(w)=-sum_(i=1)^N y_i (w dot x_i)-log[1+exp(w dot x_i) + lambda/2 sum_(i=1)^d w_j^2]
+  J(w)=-L(w)=-sum_(i=1)^N y_i (w dot x_i+b)-log[1+exp(w dot x_i+b) + lambda/2 sum_(i=1)^d w_j^2]
 $(后者可选的正则化)
 所以有:
 $
   nabla J(w)=(partial J(w))/(partial w)=sum_(i=1)^N x_i (pi(x_i)-y_i)
 $
-$pi(x_i)=1/(1+exp(-w dot x_i))$是逻辑函数，表示样本$x_i$属于正类的概率。
+$pi(x_i)=1/(1+exp(-w dot x_i+b))$是逻辑函数，表示样本$x_i$属于正类的概率。
 
 梯度下降法具体的更新公式为：
 $
@@ -142,6 +142,8 @@ $
   + *输出结果*：
     得到最终参数 $hat(w)^*$，将其拆分为权值向量 $w^*$ 和偏置 $b^*$，构建最终分类模型：
     $ f(x) = cases(1 & "if " P(Y=1|x) > 0.5, 0 & "otherwise") $
+]#note[
+  如果你很奇怪,为什么没有任何$b$的更新?这是因为,吸收偏置的技巧:令$w = [w_1,w_2,dots,w_d,b]^T in RR^(d+1),x = [x_1,x_2,dots,x_d,1]$.(注意维度多了1).这样不需要算两个梯度,只需要算一个梯度即可.只有这个算法框里用了这个技巧.当然,直接对$b$求一个梯度也能解决问题,只是记号不同了.
 ]
 
 
