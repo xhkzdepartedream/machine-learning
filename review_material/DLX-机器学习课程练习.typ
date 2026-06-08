@@ -243,8 +243,9 @@ $
 
   + 请分析哪些样本的权重会上升？这意味着 AdaBoost 下一轮学习时会偏向哪些样本？解释其原因.
 
-#answer[\(1)
-计算弱分类器权重：$alpha_1 = 1 / 2 ln frac(1 - epsilon_1, epsilon_1)$​​
+#answer[
++ 
+计算弱分类器权重：$alpha_1 = 1 / 2 ln frac(1 - epsilon_1, epsilon_1)$
 
 $epsilon_1 = 1/4$,
 $alpha_1 = (ln 3)/2 $
