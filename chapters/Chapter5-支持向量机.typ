@@ -670,7 +670,7 @@ $
   ),
   // 子图 (b)
   figure(
-    image("/assets/image-8.png", width: 100%),
+    image("/assets/image-9.png", width: 100%),
     caption: [使用低C值SVM,间隔违例较多,但是间隔较大,泛化能力更强 ],
     //supplement: none,
   ),
