@@ -151,28 +151,6 @@ $
 $
 这是一个凸二次规划问题.
 
-
-
-#algorithm[训练：线性可分支持向量机][
-  *输入：*线性可分训练数据集$T={(x_1,y_1),(x_2,y_2),dots,(x_N,y_N)}$,其中$x_i in cal(X) = R^n, y_i in cal(Y)={-1,+1},i=1,2,dots,N$.
-
-  *输出：*最大间隔分离超平面和分类决策函数.
-
-  1. 构造并求解约束最优化问题,求得$w^*,b^*$：
-  $
-    &min_(w,b) 1/2 norm(w)^2\
-  &s.t. y_i (w dot x_i+b) - 1 gt.eq.slant 0, #h(1em)i=1,2,dots,N
-  $
-  2. 由此得到分离超平面：
-  $
-    w^* dot x+b^*=0
-  $
-  分类决策函数：
-  $
-    f(x)="sign"(w^* dot x+b^*)
-  $
-]
-
 #theorem[
   若训练数据集$T$线性可分,则可将训练数据集中的样本点完全正确分开的最大间隔分离超平面存在且唯一.
 ]
@@ -350,7 +328,34 @@ $#remark[
   这就是说,分类决策函数只依赖于输入$x$和所有训练样本输入的内积.在预测阶段,新点$x$的预测,只需要计算它与支持向量的内积即可.
 ]<neiji>
 
-综上所述,对于给定的线性可分训练数据集,可以首先求对偶问题的解$alpha^*$,再求出原始问题的解$w^*, b^*$,从而得到分离超平面及分类决策函数.这种算法称为线性可分支持向量机的对偶学习算法,是线性可分支持向量机学习的基本算法.在现实问题中,训练数据集往往线性不可分,样本中出现噪声或特一点,此时有更一般的学习算法.
+综上所述,我们得到以下算法
+#algorithm[线性可分支持向量机][
+  *输入：*训练数据集$T={(x_1,y_1),(x_2,y_2),dots,(x_N,y_N)}$,其中,$x_i in cal(X)=R^n, y_i in cal(Y)={-1,+1},i=1,2,dots,N$.
+
+  *输出：*分离超平面和分类决策函数.
+
+  1. 构造并求解凸二次规划问题,求得最优解$alpha^*=(alpha_1^*, alpha_2^*,dots,alpha_N^*)^T$：
+  $
+    &min_alpha #h(1em)1/2 sum_(i=1)^N sum_(j=1)^N alpha_i alpha_j y_i y_j (x_i dot x_j)-sum_(i=1)^N alpha_i\
+  &s.t.#h(1em)sum_(i=1)^N alpha_i y_i=0,alpha_i gt.eq.slant 0,i=1,2,dots,N
+  $
+  2. 计算$w^*=sum_(i=1)^N alpha_i^* y_i x_i$
+
+    选择$alpha^*$的一个分量$alpha_j^*$满足条件$alpha^*_j>0$,计算
+    $
+      b^*=y_j-sum_(i=1)^N y_i alpha_i^* (x_i dot x_j)
+    $
+  3. 求得分离超平面
+$
+  sum_(i=1)^N alpha_i^* y_i (x dot x_i)+b^*=0
+$
+分类决策函数
+$
+  f(x)="sign"[sum_(i=1)^N alpha_i^* y_i (x dot x_i)+b^*]
+$
+]
+
+在现实问题中,训练数据集往往线性不可分,样本中出现噪声或特一点,此时有更一般的学习算法.
 
 #example[
   *1. 准备数据*
@@ -391,7 +396,7 @@ $ cases(
   (partial S) / (partial alpha_2) = 13 alpha_2 + 10 alpha_1 - 2 = 0
 ) $
 
-联立解得 $alpha_1 = 1.5, alpha_2 = -1$.由于 $alpha_2 = -1 < 0$ 违反约束,说明极值在边界上.
+联立解得 $alpha_1 = 1.5, alpha_2 = -1$.由于 $alpha_2 = -1 < 0$ 违反约束,说明极值在边界上.放弃那个越界变量的偏导方程，
 令 $alpha_2 = 0$,代回第一个方程 $4 alpha_1 = 1$,得 $alpha_1 = 0.25$.
 此时 $alpha_3 = alpha_1 + alpha_2 = 0.25$.
 
@@ -951,14 +956,9 @@ $
 $
 在这个问题中,变量是拉格朗日乘子,一个变量$alpha_i$对应于一个样本点$(x_i,y_i)$；变量的总数等于训练样本容量$N$.
 
-SMO算法是一个启发式算法,其基本思路是: 如果所有变量的解都满足此最优化问题的KKT条件,那么这个最优化问题的解就得到了,因为KKT条件是该最优化问题的充分必要条件.否则,选择两个变量,固定其他变量,*针对这两个变量构建一个二次规划问题*.这个二次规划问题关于这两个变量的解应该更接近原始二次规划问题的解,因为这会使得原始二次规划问题的目标函数值变得更小.重要的是,这时子问题可以通过解析方法求解,这样就可以大大提高了求解速度.子问题有两个变量,一个是违反KKT条件最严重的一个,另一个由约束条件自动确定.
+SMO 要解决什么？解决样本量太大时，全变量对偶问题算不动的算力危机。每次优化两个变量。一般而言一个是违反KKT条件最严重的一个,另一个由约束条件自动确定.
 
-注意,子问题的两个变量中只有一个是自由变量,假设$alpha_1$, $alpha_2$为两个变量, $alpha_3, alpha_4, dots, alpha_N$固定,我们易得：
-$
-  alpha_1=-y_1 sum_(i=2)^N alpha_i y_i
-$
-
-如果$alpha_2$确定,那么$alpha_1$也随之确定,所以子问题中同时更新两个变量.整个SMO算法包括两个部分：*求解两个变量二次规划的解析方法*和*选择变量的启发式方法*.
+整个SMO算法包括两个部分：*求解两个变量二次规划的解析方法*和*选择变量的启发式方法*.
 
 不失一般性,假设选择的两个变量是$alpha_1, alpha_2$,其他变量$alpha_i (i=3,4,dots,N)$是固定的.于是SMO的最优化问题的子问题可以写成
 $
@@ -968,7 +968,7 @@ $
 $
 其中, $K_(i j)=K(x_i,x_j),i,j=1,2,dots,N$, $sigma.alt$是常数.
 
-易知$alpha_1, alpha_2$确定其一就可以确定另外一个,所以这其实是一个单变量的最优化问题,不妨考虑为变量$alpha_2$的最优化问题.
+注意,子问题的两个变量中只有一个是自由变量。$alpha_1, alpha_2$确定其一就可以确定另外一个,所以这其实是一个单变量的最优化问题,不妨考虑为变量$alpha_2$的最优化问题.
 
 当$y_1 eq.not y_2$时,$alpha_1-alpha_2=k$, 因为$0 lt.eq.slant alpha_1,alpha_2 lt.eq.slant C$, 所以有$alpha_2 in [k, C+k] inter [0,C]$, 所以定义$L=max(0,k)=max(0,alpha_2-alpha_1), H=min(C, C+alpha_2-alpha_1)$, 则有$L lt.eq.slant alpha_2^("new") lt.eq.slant H$, 对于$y_1=y_2$的情况,同理有$L=max(0,alpha_2+alpha_1-C), H=min(C, alpha_2+alpha_1)$.
 
@@ -1005,9 +1005,6 @@ $
   $
 ]
 
-#proof[
-  暂略.
-]
 
 #theorem[阈值 $b$ 的更新][
   在每一步更新完 $alpha_1$ 和 $alpha_2$ 后,需要更新 $b$.
@@ -1040,26 +1037,77 @@ $
 变量2的选择暂略.
 
 #algorithm[SMO算法][
-  *输入*：训练数据集$T={(x_1,y_1),(x_2,y_2),dots,(x_N,y_N)}$,其中, $x_i in cal(X)=R^n, y_i in cal(Y)={-1,+1},i=1,2,dots,N$, 精度$epsilon$.
+  *输入*：训练数据集$T={(x_1,y_1),(x_2,y_2),dots,(x_N,y_N)}$,其中,$x_i in cal(X)=R^n, y_i in cal(Y)={-1,+1},i=1,2,dots,N$,精度$epsilon$,惩罚参数$C$.
+  *输出*：近似解$hat(alpha)$, $hat(b)$.
 
-  *输出*：近似解$hat(alpha)$.
+  1. *初始化*：取初值$alpha^((0))=(0,0,dots,0)^T$, $b^((0))=0$, 令$k=0$;
 
-  1. 取初值$alpha^((0))=0$, 令$k=0$;
-  2. 选取优化变量$alpha_1^((k)), alpha_2^((k))$,解析求解两个变量的最优化问题,求得最优解$alpha_1^((k+1)), alpha_2^((k+1))$, 更新$alpha$为$alpha^((k+1))$;
-  3. 若在精度$epsilon$范围内满足停机条件,则转步骤4,否则令$k=k+1$, 转步骤2：
-  $
-    sum_(i=1)^N alpha_i y_i=0, #h(1em)0 lt.eq.slant alpha_i lt.eq.slant C, #h(1em)i=1,2,dots, N\
-    y_i dot g(x_i)=cases(
-      gt.eq.slant 1","#h(2em)&{x_i|alpha_i=0},
-      =1"," &{x_i|0<alpha_i<C},
-      lt.eq.slant 1","&{x_i|alpha_i=C}
-    )
-  $
-  其中,
-  $
-    g(x)=sum_(i=1)^N alpha_i y_i K(x_i, x)+b
-  $
-  4. 取$hat(alpha)=alpha^((k+1))$
+  2. *变量选择（外层循环——选择$alpha_1$）*：
+     - 首先遍历所有满足$0<alpha_i<C$的样本点（间隔边界上的支持向量）,检查是否满足KKT条件：
+       $
+         alpha_i=0 arrow.double.l.r y_i g(x_i) gt.eq.slant 1,\
+         0<alpha_i<C arrow.double.l.r y_i g(x_i) = 1,\
+         alpha_i=C arrow.double.l.r y_i g(x_i) lt.eq.slant 1
+       $
+       其中$g(x)=sum_(j=1)^N alpha_j y_j K(x_j,x)+b$.
+     - 若所有支持向量点均在$epsilon$内满足KKT条件,则遍历整个训练集.
+     - 选取KKT条件违反最严重的样本点对应的变量作为$alpha_1$.
+
+  3. *变量选择（内层循环——选择$alpha_2$）*：
+     - 在剩余变量中选择$|E_1-E_i|$最大的$alpha_i$作为$alpha_2$,其中$E_i=g(x_i)-y_i$.
+     - 若上述选择未能使目标函数有足够下降,则先遍历$0<alpha_i<C$的样本,再遍历全集,选取能使$alpha_2$有最大步长的变量.
+
+  4. *解析求解子问题*：
+     - 计算$eta=K_11+K_22-2K_12=norm(Phi(x_1)-Phi(x_2))^2$.
+     - 计算未经剪辑的$alpha_2$最优解：
+       $
+         alpha_2^"new, unc"=alpha_2^"old"+(y_2(E_1-E_2))/eta
+       $
+     - 根据$eta$的正负确定取值范围边界$(L,H)$：
+       - 若$y_1 eq.not y_2$：$L=max(0,alpha_2^"old"-alpha_1^"old")$, $H=min(C,C+alpha_2^"old"-alpha_1^"old")$
+       - 若$y_1=y_2$：$L=max(0,alpha_1^"old"+alpha_2^"old"-C)$, $H=min(C,alpha_1^"old"+alpha_2^"old")$
+     - 剪辑得到$alpha_2$的更新值：
+       $
+         alpha_2^"new"=cases(
+           H","#h(2em)&alpha_2^"new, unc">H,
+           alpha_2^"new, unc""," &L lt.eq.slant alpha_2^"new, unc" lt.eq.slant H,
+           L"," &alpha_2^"new, unc"<L
+         )
+       $
+     - 更新$alpha_1$：
+       $
+         alpha_1^"new"=alpha_1^"old"+y_1 y_2 (alpha_2^"old"-alpha_2^"new")
+       $
+
+  5. *更新阈值$b$*：
+     - 若$0<alpha_1^"new"<C$：
+       $
+         b_1^"new"=-E_1-y_1 K_11 (alpha_1^"new"-alpha_1^"old")-y_2 K_21 (alpha_2^"new"-alpha_2^"old")+b^"old"
+       $
+     - 若$0<alpha_2^"new"<C$：
+       $
+         b_2^"new"=-E_2-y_1 K_12 (alpha_1^"new"-alpha_1^"old")-y_2 K_22 (alpha_2^"new"-alpha_2^"old")+b^"old"
+       $
+     - 取最终值$b^"new"$：
+       $
+         b^"new"=cases(
+           b_1^"new"\, & "若" 0<alpha_1^"new"<C,
+           b_2^"new"\, & "若" 0<alpha_2^"new"<C,
+           (b_1^"new"+b_2^"new")/2\, & "否则"
+         )
+       $
+
+  6. *停机条件检验*：若在精度$epsilon$范围内满足以下KKT条件,则转步骤7,否则令$k=k+1$,转步骤2：
+     $
+       sum_(i=1)^N alpha_i y_i=0, #h(1em)0 lt.eq.slant alpha_i lt.eq.slant C, #h(1em)i=1,2,dots, N\
+       y_i g(x_i)=cases(
+         gt.eq.slant 1","#h(2em)&{x_i|alpha_i=0},
+         =1"," &{x_i|0<alpha_i<C},
+         lt.eq.slant 1","&{x_i|alpha_i=C}
+       )
+     $
+
+  7. *输出*：取$hat(alpha)=alpha^((k+1))$, $hat(b)=b^"new"$.
 ]
 
 #example[
