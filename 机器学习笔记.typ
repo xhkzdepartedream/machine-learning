@@ -2,11 +2,11 @@
 #import "@preview/in-dexter:0.7.2": index, make-index
 #import "pinyin-sort.typ": pinyin-sort
 
-#set text(size: 9pt)
+
 #show: conf.with(
   sidebar:false,
   title: "机器学习方法",
-  author: "bjhh2025, xhkzdepartedream, kiwiizzz, zoomy",
+  author: "bjhh2005, xhkzdepartedream, kiwiizzz, zoomy",
   date: "2026.6"
 )
 #show heading: set block(below: -0.1em) // 默认值通常较大,可以改成 0.8em 或更小
@@ -44,6 +44,7 @@
   #outline(depth: 3)
 ]
 #pagebreak()
+#set text(size: 9pt)
 #include "chapters/Chapter1&2-机器学习概论.typ"
 
 #include "chapters/Chapter3.1-线性判别函数与感知机模型.typ"

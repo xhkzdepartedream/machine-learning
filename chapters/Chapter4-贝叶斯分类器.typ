@@ -356,5 +356,5 @@ $
   + *收敛与平稳*：经过足够次数的迭代(Burn-in 阶段)后,生成的样本将服从真实的后验分布 $P(bold(Q) | bold(E) = bold(e))$.
 
   假定总采样次数为 $T$,其中与目标状态 $bold(q)$ 一致的样本数量为 $n_q$,则后验概率的近似值为：
-  $ P(bold(q) | bold(E) = bold(e)) approx n_q / T $.
+  $ P(bold(q) | bold(E) = bold(e)) approx n_q / T $. (111)
 ]
