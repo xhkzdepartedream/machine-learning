@@ -36,7 +36,7 @@
 
 // #include "前言.typ"
 // #pagebreak()
-
+#show outline:text.with(size:9.5pt)
 #show outline.entry: it => {
   block(above: 0.5em, below: 0.5em)[#it]
 }

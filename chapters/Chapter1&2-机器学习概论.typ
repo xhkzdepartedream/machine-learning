@@ -3,7 +3,7 @@
 #import "@preview/cuti:0.4.0":show-cn-fakebold
 #import "@preview/cetz:0.5.2":*
 
-#counter(page). update(1)
+#counter(page).update(1)
 #let plot(width:100%)= {
    cetz.canvas({
   import cetz.draw: *
