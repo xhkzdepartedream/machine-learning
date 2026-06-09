@@ -21,10 +21,10 @@
 )
 
 #let appendix(body) = {
-  counter(heading).update(0)
+  counter(heading). update(0)
   set heading(numbering: "A.1")
   show heading.where(level: 1): it => {
-    let nos = counter(heading).at(it.location())
+    let nos = counter(heading). at(it.location())
     let letter = numbering("A", ..nos)
     block(sticky: true, weight: "bold", size: 1.2em)[Appendix #letter #it.body]
   }
@@ -39,7 +39,7 @@
     radius: 4pt,            // 圆角
     breakable: true,        // 核心：允许内容跨页断开
     [
-      #set text(fill: luma(120), size: 0.95em) // 字色调浅，字号微调，视觉降权
+      #set text(fill: luma(120), size: 0.95em) // 字色调浅,字号微调,视觉降权
       #body
     ]
   )
@@ -54,7 +54,7 @@
   title: "您的文档标题",
   subtitle: "",
   author: "作者姓名",
-  date: datetime.today().display("[year]年[month]月[day]日"),
+  date: datetime.today(). display("[year]年[month]月[day]日"),
   header-title: "Machine Learning",
   header-chapter: "CHAPTER 4",
   font: ("New Computer Modern", "Source Han Serif", "SimSun"),
@@ -73,7 +73,7 @@
   show: thmbox-init(counter-level: 3)
   show: show-cn-fakebold
 
-  // --- B. 封面页 (渲染完立刻结束，不带边栏规则) ---
+  // --- B. 封面页 (渲染完立刻结束,不带边栏规则) ---
   page(numbering: none, header: none, footer: none, margin: margin)[
     #set align(center); #set par(first-line-indent: 0em)
     #v(20%); #text(size: 32pt, weight: "bold")[#title]
@@ -83,7 +83,7 @@
   ]
   
   pagebreak()
-  counter(page).update(1)
+  counter(page). update(1)
 
   // --- C. 核心：注入边栏与正文样式 ---
   
@@ -98,7 +98,7 @@
     
     top: margin.top,
     bottom: margin.bottom,
-    book: true, // 开启书本模式，inner/outer 会在奇偶页自动交换
+    book: true, // 开启书本模式,inner/outer 会在奇偶页自动交换
     clearance: 10pt,
   )
   show: marginalia.show-frame
@@ -111,12 +111,12 @@
       marginalia.header(
         text-style: (size: 11.5pt, font: font), [],
         [#smallcaps(header-title) #text(fill: luma(60%))[_ #header-chapter _]],
-        [Page #counter(page).display("1 of 1", both: true)],
+        [Page #counter(page). display("1 of 1", both: true)],
       )
     },
     // footer: context {
     //   set align(center); set text(size: 9pt, fill: luma(100))
-    //   [#author —— #counter(page).display("1") —— #title]
+    //   [#author —— #counter(page). display("1") —— #title]
     // },
   )
 

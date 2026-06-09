@@ -8,7 +8,7 @@
 #set heading(outlined: true)
 #text(1.3em)[*Preamble*]
 
-The HHY Open Note License applies to the designated note works created by *hhy* or *bjhh2005* (hereinafter referred to as the "Original Author"). The goal of this license is to promote open knowledge and academic collaboration. You are free to use and share these notes under the terms outlined below. We wish all users smooth study progress and satisfactory results in your examinations!
+The HHY Open Note License applies to the designated note works created by *hhy* or *bjhh2005* (hereinafter referred to as the "Original Author").  The goal of this license is to promote open knowledge and academic collaboration. You are free to use and share these notes under the terms outlined below. We wish all users smooth study progress and satisfactory results in your examinations!
 
 #text(1.3em)[*Permissions Granted*]
 

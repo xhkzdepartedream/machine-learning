@@ -1,5 +1,6 @@
 #import "@local/ysz_tools:0.1.0": *
 #import "@preview/in-dexter:0.7.2": index, make-index
+#import "pinyin-sort.typ": pinyin-sort
 
 #set text(size: 9pt)
 #show: conf.with(
@@ -8,9 +9,9 @@
   author: "bjhh2025, xhkzdepartedream, kiwiizzz, zoomy",
   date: "2026.6"
 )
-#show heading: set block(below: -0.1em) // 默认值通常较大，可以改成 0.8em 或更小
+#show heading: set block(below: -0.1em) // 默认值通常较大,可以改成 0.8em 或更小
 #set footnote.entry(
-  // 上方横线：默认只有 30% 宽，我们把它改成 100% 满宽，并设置粗细
+  // 上方横线：默认只有 30% 宽,我们把它改成 100% 满宽,并设置粗细
   separator: line(length: 100%, stroke: 0.5pt),
   // clearance: 1.5em, // 脚注与正文之间的间距
   // gap: 0.8em,       // 多个脚注之间的间距
@@ -81,6 +82,6 @@
 #pagebreak()
 = 名词索引
 #columns(4)[
-  #make-index(title: none)
+  #make-index(title: none, sort-order: k => pinyin-sort(k))
 ]
 
