@@ -1,6 +1,6 @@
 #import "@local/ysz_tools:0.1.0": *
 #import "@preview/in-dexter:0.7.2": index
-
+#show: conf
 = 集成学习
 == 定义与概念
 *集成学习*(Ensemble Learning)通过构建并结合多个学习器来完成学习任务#index[集成学习],通常能够获得比单一学习器显著优越的泛化性能.每个个体学习器可以是不同的.
@@ -10,12 +10,13 @@
   Multi-View + Mixture of Expert:核心思想是不同视图对应不同的语义信息源,目标是利用数据的多模态/多表示结构.每个"专家"对应一个语义上不同的视图（如图像、文本、音频；或不同传感器；或不同特征子集的语义分组）;差异性来源是数据本身的结构异质性.学习目标往往包含视图一致性约束(co-training、CCA 等),这是集成学习没有的
 ]
 
-集成学习主要分为两大类：一类是利用基学习器之间的依赖关系进行串行生成的Boosting#index[Boosting] (如AdaBoost, GBDT)；另一类是利用基学习器之间的独立性进行并行生成的Bagging,以及其特例*随机森林*(Random Forest)#index[Bagging]#index[随机森林]. 随机森林方法简单、易实现、计算开销小,在很多实际任务中展现出强大的性能,被誉为“代表集成学习技术水平的方法”.
+集成学习主要分为两大类：一类是利用基学习器之间的依赖关系进行串行生成的Boosting#index[Boosting] (如AdaBoost, GBDT)；另一类是利用基学习器之间的独立性进行并行生成的Bagging,以及其特例*随机森林*(Random Forest).
 
 
-=== 同质集成/异质集成
-*同质集成 (Homogeneous Ensemble) *：集成中只包含同种类型的个体学习器,此时个体学习器也被称为*“基学习器(base learner)”* ,相应的学习算法称为*“基学习算法”*.
-*异质集成 (Heterogeneous Ensemble) *：只要是使用多个学习器来解决问题,就可以认为符合集成学习的广义形式.个体学习器由不同的学习算法生成,不存在“基学习算法”.相应地,个体学习器一般不称为“基学习器”.
+=== 同质集成/异质集成#index[同质集成/异质集成]
+- *同质集成 (Homogeneous Ensemble) *：集成中只包含同种类型的个体学习器,此时个体学习器也被称为*“基学习器(base learner)”* ,相应的学习算法称为*“基学习算法”*.
+
+- *异质集成 (Heterogeneous Ensemble) *：只要是使用多个学习器来解决问题,就可以认为符合集成学习的广义形式.个体学习器由不同的学习算法生成,不存在“基学习算法”.相应地,个体学习器一般不称为“基学习器”.
 
 === 多专家组合(multiexpert combination)
 个体学习器并行工作.
@@ -51,21 +52,14 @@
   某些任务的真实最佳分类器不在当前算法能表达的范围内.单个模型无效,但多个模型线性组合后可能逼近真实分类器.
 
 === How to Ensenble?
-- Combination level（集成层面）
-设计不同的“组合器”（Combiner）,比如投票、加权平均、Stacking元学习器等.
-✅ 举例：同样是5个模型,你可以用“多数投票”,也可以用“按准确率加权”,还可以用另一个模型来学习怎么组合它们 —— 这就是在“集成层面”制造多样性.
-
-- Classifier level（模型层面）
-使用不同的基分类器（Base Classifiers）,比如有的用决策树,有的用SVM,有的用神经网络.
-✅ 举例：异质集成（如Stacking）就是在这个层面做文章 —— 让不同算法的模型一起工作.
-
-- Feature level（特征层面）
-给每个模型提供不同的特征子集（Feature Subsets）.
-✅ 举例：随机森林中每棵树只看到部分特征；或者人工给不同模型分配不同列的数据.
-
-- Data level（数据层面）
-给每个模型提供不同的数据子集（Data Subsets）,比如自助采样（Bootstrap Sampling）.
-✅ 举例：Bagging / 随机森林的核心 —— 每棵树训练在不同的 bootstrap 样本上.
+- Combination level（集成层面）：设计不同的“组合器”（Combiner）,比如投票、加权平均、Stacking元学习器等.
+  - ✅ 举例：同样是5个模型,你可以用“多数投票”,也可以用“按准确率加权”,还可以用另一个模型来学习怎么组合它们 —— 这就是在“集成层面”制造多样性.
+- Classifier level（模型层面）：使用不同的基分类器（Base Classifiers）,比如有的用决策树,有的用SVM,有的用神经网络.
+  - ✅ 举例：异质集成（如Stacking）就是在这个层面做文章 —— 让不同算法的模型一起工作.
+- Feature level（特征层面）：给每个模型提供不同的特征子集（Feature Subsets）.
+  - ✅ 举例：随机森林中每棵树只看到部分特征；或者人工给不同模型分配不同列的数据.
+- Data level（数据层面）：给每个模型提供不同的数据子集（Data Subsets）,比如自助采样（Bootstrap Sampling）.
+  - ✅ 举例：Bagging / 随机森林的核心 —— 每棵树训练在不同的 bootstrap 样本上.
 
 #include ("Chapter7.2-Boosting.typ")
 

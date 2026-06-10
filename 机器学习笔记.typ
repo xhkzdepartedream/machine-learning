@@ -2,7 +2,6 @@
 #import "@preview/in-dexter:0.7.2": index, make-index
 #import "pinyin-sort.typ": pinyin-sort
 
-
 #show: conf.with(
   sidebar:false,
   title: "机器学习方法",
