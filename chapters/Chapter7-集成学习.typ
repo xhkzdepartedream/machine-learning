@@ -1,6 +1,5 @@
 #import "@local/ysz_tools:0.1.0": *
 #import "@preview/in-dexter:0.7.2": index
-#show: conf
 = 集成学习
 == 定义与概念
 *集成学习*(Ensemble Learning)通过构建并结合多个学习器来完成学习任务#index[集成学习],通常能够获得比单一学习器显著优越的泛化性能.每个个体学习器可以是不同的.
