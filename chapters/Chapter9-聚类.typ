@@ -1,6 +1,5 @@
 #import "@local/ysz_tools:0.1.0": *
 #import "@preview/in-dexter:0.7.2": index
-#show:conf
 = 聚类
 == 聚类方法
 形式化地：
