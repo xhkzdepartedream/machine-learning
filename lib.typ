@@ -2,31 +2,48 @@
 #import "@preview/thmbox:0.3.0": *
 #import "@preview/hydra:0.6.2": hydra
 #import "@preview/i-figured:0.2.4"
-#import "@preview/cetz:0.3.1"
-#import "@preview/mitex:0.2.6": *
+#import "@preview/cetz:0.5.2"
+#import "@preview/mitex:0.2.7": *
 #import "@preview/cuti:0.4.0": show-cn-fakebold
 #import "@preview/marginalia:0.3.1" as marginalia
+#import "@preview/marginalia:0.3.1":wideblock
 
 // ======================================================
-// 1. 全局组件定义
+// 1. 全局状态与组件定义
 // ======================================================
+
+#let _sidebar-state = state("_sidebar-state", true)
 
 #let a-note-counter = counter("a-note")
-#let note = marginalia.note.with(
-  counter: a-note-counter, 
-  numbering: (..i) => text(
-    weight: 500, font: "JetBrains Mono", size: 7pt, fill: rgb("#ff3a3a"),
-    numbering("[a]", ..i),
-  )
-)
+#let note(body) = context {
+  if _sidebar-state.get() {
+    marginalia.note(
+      counter: a-note-counter,
+      numbering: (..i) => text(
+        weight: 500, font: "JetBrains Mono", size: 7pt, fill: rgb("#ff3a3a"),
+        numbering("[a]", ..i),
+      ),
+      body,
+    )
+  } else {
+    a-note-counter.step()
+    let marker = a-note-counter.display("[a]")
+    box(inset: (x: 2pt, y: 1pt))[
+      #text(weight: 500, font: "JetBrains Mono", size: 7pt, fill: rgb("#ff3a3a"), marker) #text(size: 9pt, fill: luma(100), body)
+    ]
+  }
+}
 
 #let appendix(body) = {
-  counter(heading). update(0)
+  // counter(heading).update(0)
   set heading(numbering: "A.1")
   show heading.where(level: 1): it => {
-    let nos = counter(heading). at(it.location())
+    let nos = counter(heading).at(it.location())
     let letter = numbering("A", ..nos)
-    block(sticky: true, weight: "bold", size: 1.2em)[Appendix #letter #it.body]
+    // 将 weight 和 size 移入 text() 函数中
+    block(sticky: true)[
+      #text(weight: "bold", size: 1.2em)[Appendix #letter #it.body]
+    ]
   }
   body
 }
@@ -39,7 +56,7 @@
     radius: 4pt,            // 圆角
     breakable: true,        // 核心：允许内容跨页断开
     [
-      #set text(fill: luma(120), size: 0.95em) // 字色调浅,字号微调,视觉降权
+      #set text(fill: luma(120), size: 0.95em) // 字色调浅，字号微调，视觉降权
       #body
     ]
   )
@@ -54,14 +71,15 @@
   title: "您的文档标题",
   subtitle: "",
   author: "作者姓名",
-  date: datetime.today(). display("[year]年[month]月[day]日"),
-  header-title: "Machine Learning",
-  header-chapter: "CHAPTER 4",
+  date: datetime.today().display("[year]年[month]月[day]日"),
+  header-title: none,
+  header-chapter: none,
   font: ("New Computer Modern", "Source Han Serif", "SimSun"),
   font-size: 12pt,
   paper: "a4",
   margin: (top: 2.5cm, left: 1.5cm, right: 1.5cm, bottom: 1.5cm),
   heading-numbering: numbly("第{1}章", "{1}.{2}节", "{1}.{2}.{3}", "({5:a})"),
+  sidebar: true,
   body,
 ) = {
   // --- A. 基础样式 ---
@@ -73,7 +91,9 @@
   show: thmbox-init(counter-level: 3)
   show: show-cn-fakebold
 
-  // --- B. 封面页 (渲染完立刻结束,不带边栏规则) ---
+  context _sidebar-state.update(x => sidebar)
+
+  // --- B. 封面页 (渲染完立刻结束，不带边栏规则) ---
   page(numbering: none, header: none, footer: none, margin: margin)[
     #set align(center); #set par(first-line-indent: 0em)
     #v(20%); #text(size: 32pt, weight: "bold")[#title]
@@ -83,48 +103,66 @@
   ]
   
   pagebreak()
-  counter(page). update(1)
+  counter(page).update(1)
 
-  // --- C. 核心：注入边栏与正文样式 ---
-  
-  // 1. 启动边栏设置 (它会自动管理后续页面的 margin)
-// 1. 启动边栏设置
-  show: marginalia.setup.with(
-    // 内侧（无旁注侧）：直接使用用户设置的 margin.left
-    inner: (far: margin.left, width: 0pt, sep: 0pt), 
-    
-    // 外侧（旁注侧）：从 margin.right 开始往里算
-    outer: (far: margin.right, width: 55mm, sep: 8mm),
-    
-    top: margin.top,
-    bottom: margin.bottom,
-    book: true, // 开启书本模式,inner/outer 会在奇偶页自动交换
-    clearance: 10pt,
-  )
-  show: marginalia.show-frame
+  // --- C. 核心：正文样式 (条件性边栏) ---
 
-  // 2. 正文页面布局 (注意：这里绝对不能再 set margin 了！)
-  set page(
-    paper: paper,
-   // numbering: "1",
-    header: context {
-      marginalia.header(
-        text-style: (size: 11.5pt, font: font), [],
-        [#smallcaps(header-title) #text(fill: luma(60%))[_ #header-chapter _]],
-        [Page #counter(page). display("1 of 1", both: true)],
-      )
-    },
-    // footer: context {
-    //   set align(center); set text(size: 9pt, fill: luma(100))
-    //   [#author —— #counter(page). display("1") —— #title]
-    // },
-  )
+  // show-rule 必须写在块外才能生效，用 if 表达式选择规则
+  show: if sidebar {
+    marginalia.setup.with(
+      inner: (far: margin.left, width: 0pt, sep: 0pt),
+      outer: (far: margin.right, width: 50mm, sep: 5mm),
+      top: margin.top,
+      bottom: margin.bottom,
+      book: true,
+      clearance: 10pt,
+    )
+  } else { (x) => x }
+
+  show: if sidebar { marginalia.show-frame } else { (x) => x }
+
+  // 用 let + 展开语法条件性地设置 page 参数
+  let header-left = if header-title != none [
+    #smallcaps(header-title)
+    #text(fill: luma(60%))[_ #if header-chapter != none { header-chapter } _]
+  ] else { [] }
+
+  let page-args = if sidebar {
+    (
+      paper: paper,
+      header: context {
+        marginalia.header(
+          text-style: (size: 11.5pt, font: font), [],
+          header-left,
+          [Page #counter(page).display("1 of 1", both: true)],
+        )
+      },
+    )
+  } else {
+    (
+      paper: paper,
+      margin: margin,
+      header: context {
+        set text(size: 11.5pt, font: font)
+        align(left + horizon)[
+          #header-left
+          #h(1fr)
+          Page #counter(page).display("1 of 1", both: true)
+        ]
+      },
+    )
+  }
+  set page(..page-args)
 
   // 3. 其他正文细节
   show math.equation: i-figured.show-equation.with(only-labeled: true, level: 2)
-  show math.equation: set text(purple)
-  show raw.where(block: false): it => box(fill: luma(240), inset: (x: 3pt), radius: 2pt, it)
+  show math.equation: set text(font: ("New Computer Modern Math",) + font, black)
+  show raw.where(block: false): it => {
+    set text(font: ("JetBrains Mono", "Source Han Serif", "SimSun"))
+    box(fill: luma(240), inset: (x: 3pt), radius: 2pt, it)
+  }
   show raw.where(block: true): it => {
+    set text(font: ("JetBrains Mono", "Source Han Serif", "SimSun"))
     block(fill: luma(252), stroke: 0.5pt + luma(200), radius: 6pt, width: 100%, clip: true,
       stack(dir: ttb,
         block(fill: luma(240), width: 100%, inset: 8pt, text(weight: "bold", size: 8pt, upper(it.lang))),

@@ -5,9 +5,10 @@
 #show: conf.with(
   sidebar:false,
   title: "机器学习方法",
-  author: "bjhh2005, xhkzdepartedream, kiwiizzz, zoomy",
+  author: "bjhh2005, xhkzdepartedream, kiwiizzz, zoomy, 红隼饲养员",
   date: "2026.6"
 )
+#show math.equation: set text(black)
 #show heading: set block(below: -0.1em) // 默认值通常较大,可以改成 0.8em 或更小
 #set footnote.entry(
   // 上方横线：默认只有 30% 宽,我们把它改成 100% 满宽,并设置粗细
@@ -31,10 +32,10 @@
   it // 渲染脚注内容本身
   line(length: 100%, stroke: 0.5pt) // 下方横线
 }
-// #include "license.typ"
-
-// #include "前言.typ"
-// #pagebreak()
+#include "license.typ"
+#pagebreak()
+#include "前言.typ"
+#pagebreak()
 #show outline:text.with(size:9.5pt)
 #show outline.entry: it => {
   block(above: 0.5em, below: 0.5em)[#it]
@@ -43,7 +44,7 @@
   #outline(depth: 3)
 ]
 #pagebreak()
-#set text(size: 9pt)
+#set text(size: 10pt)
 #include "chapters/Chapter1&2-机器学习概论.typ"
 
 #include "chapters/Chapter3.1-线性判别函数与感知机模型.typ"

@@ -1,7 +1,6 @@
 #import "@local/ysz_tools:0.1.0": *
 #import "@preview/in-dexter:0.7.2": index
 #show: thmbox-init(counter-level: 3)
-#show: conf
 == $k$近邻法
 
 $k$近邻法的*输入为实例的特征向量*,对应于特征空间的点；输出为*实例的类别*,可以取多类.
