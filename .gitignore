@@ -1,6 +1,6 @@
-*.pdf
+
 .DS_Store
-slides/
+
 exps/
 node_modules
 package.json

@@ -1,4 +1,4 @@
-#set text(font: ("Source Han Serif"), size: 12pt, lang: "zh")
+#set text(font: ("New Computer Modern","STSong"), size: 12pt, lang: "zh")
 #align(center, text(weight: "bold", size: 2em)[前言])
 
 本笔记系个人依据李航老师《统计学习方法》整理而成.受限于时间,部分章节略有删减,但在编写过程中广泛参考了 CSDN、知乎等技术社区的优质资料.此外,针对机器学习考试需求,文中额外补充了大量例题,并保留了核心数学推导过程.限于笔者水平,内容难免存在覆盖不全或疏漏之处,敬请谅解.
