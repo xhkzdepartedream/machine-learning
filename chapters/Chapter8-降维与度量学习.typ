@@ -1,6 +1,5 @@
 #import "@local/ysz_tools:0.1.0": *
 #import "@preview/in-dexter:0.7.2": index
-// #show:conf
 #set math.equation(numbering: "(1)")
 = 降维与度量学习
 == 低维嵌入
